@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "NoteBlob.hpp"
 
 class ofApp : public ofBaseApp {
     public:
@@ -24,5 +25,7 @@ class ofApp : public ofBaseApp {
         ofMesh mesh;
         ofMesh noteMesh; 
         ofImage img;
+    
+    vector<NoteBlob> noteBlobs;
 };
 

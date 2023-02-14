@@ -23,7 +23,6 @@ class ofApp : public ofBaseApp {
         
         ofEasyCam cam;
         ofMesh mesh;
-        ofMesh noteMesh; 
         ofImage img;
     
     vector<NoteBlob> noteBlobs;

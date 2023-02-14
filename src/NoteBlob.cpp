@@ -9,7 +9,9 @@ NoteBlob::NoteBlob(glm::vec3 pos) {
 
 
 void NoteBlob::update(){
-//    position.z = position.z + ofMap(ofNoise(ofRandom(10), (ofGetElapsedTimef() * 0.5)), 0, 1, -2, 2);
+    //        verts[i].x += ofSignedNoise(verts[i].x/liquidness, verts[i].y/liquidness,verts[i].z/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+    //        verts[i].y += ofSignedNoise(verts[i].z/liquidness, verts[i].x/liquidness,verts[i].y/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+    //        verts[i].z += ofNoise(verts[i].y/liquidness, verts[i].z/liquidness,verts[i].x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;//
 
     float liquidness = 50;
     float amplitude = 2.0;

@@ -1,28 +1,40 @@
 #include "ofMain.h"
 #include "NoteBlob.hpp"
+#include "Blip.hpp"
 
-NoteBlob::NoteBlob(glm::vec3 pos) {
+
+NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
     position = pos;
     size = 1;
-    color.set(ofRandom(100),ofRandom(100),ofRandom(2));
+    color.set(ofRandom(255),ofRandom(255),ofRandom(255));
 }
 
 
-void NoteBlob::update(){
-    //        verts[i].x += ofSignedNoise(verts[i].x/liquidness, verts[i].y/liquidness,verts[i].z/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-    //        verts[i].y += ofSignedNoise(verts[i].z/liquidness, verts[i].x/liquidness,verts[i].y/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-    //        verts[i].z += ofNoise(verts[i].y/liquidness, verts[i].z/liquidness,verts[i].x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;//
-
-    float liquidness = 50;
-    float amplitude = 2.0;
-    float speedDampen = 20;
-
-    position.z += ofSignedNoise(position.z/liquidness, position.y/liquidness,position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+void NoteBlob::update(float liquidness, float speedDampen){
+    position.z += ofSignedNoise(position.x / liquidness, position.y, ofGetElapsedTimef()/ speedDampen) * 0.2;
+    
+    float absoluteVal = abs(position.z);
+    bool applyForce = false;
+    
+    if (absoluteVal < 0.2) {
+        blip.size = 2;
+        if (position.z < 0) {
+            position.z = 0.3;
+        } else {
+            position.z = -0.3;
+        }
+        applyForce = true;
+    }
+    blip.update();
 }
 
 void NoteBlob::draw(){
     ofSetColor(color);
-    ofDrawSphere(position, size);
+    blip.draw();
+    ofNoFill();
+//    ofSetSphereResolution(3);
+//    ofDrawSphere(position, size);
+    ofFill();
 }
 
 void NoteBlob::reset(){

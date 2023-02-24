@@ -25,6 +25,8 @@ class ofApp : public ofBaseApp {
         ofMesh mesh;
         ofImage img;
     
-    vector<NoteBlob> noteBlobs;
+        float liquidness;
+        float speedDampen;
+        vector<NoteBlob> noteBlobs;
 };
 

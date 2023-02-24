@@ -2,13 +2,13 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-    ofSetFrameRate(60);
+    ofSetFrameRate(30);
     ofSetVerticalSync(true);
     img.load("bach.png");
     
     mesh.setMode(OF_PRIMITIVE_POINTS);
     
-    int skip = 2;
+    int skip = 1;
     for(int y = 0; y < img.getHeight(); y += skip) {
         for(int x = 0; x < img.getWidth() -1; x += skip) {
             ofColor cur = img.getColor(x, y);
@@ -18,9 +18,9 @@ void ofApp::setup() {
                 noteBlobs.push_back(newNoteBlob);
             }
             else {
-                float z = 0.0;
+                float z = 1.0;
                 cur.a == 255;
-                mesh.addColor(ofColor(ofRandom(100, 110), ofRandom(50, 80), ofRandom(200, 255)));
+                mesh.addColor(ofColor(0, 0, 0));
                 glm::vec3 pos(x, y, z);
                 mesh.addVertex(pos);
             }
@@ -29,20 +29,23 @@ void ofApp::setup() {
     
     ofEnableDepthTest();
     glEnable(GL_POINT_SMOOTH);
-    glPointSize(4); // make the points bigger
+    glPointSize(6); 
+    
+    liquidness = 1.0;
+    speedDampen = 20.0;
 }
 
 //--------------------------------------------------------------
 
 void ofApp::update() {
     for (int i = 0; i<noteBlobs.size(); i++) {
-        noteBlobs[i].update();
+        noteBlobs[i].update(liquidness, speedDampen);
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-    ofBackgroundGradient(ofColor::gray, ofColor::black, OF_GRADIENT_CIRCULAR);
+    ofBackground(50,60,60);
     cam.begin();
     ofScale(2, -2, 2); // flip the y axis and zoom in a bit
     //    ofRotateYDeg(90);
@@ -61,6 +64,27 @@ void ofApp::keyPressed(int key){
             for (int i = 0; i<noteBlobs.size(); i++) {
                 noteBlobs[i].reset();
             }
+            break;
+            
+        case OF_KEY_LEFT:
+            if (liquidness > 0) {
+                liquidness -= 0.5;
+            }
+            std::cout << "Lquid: " << liquidness << std::endl;
+            break;
+        case OF_KEY_RIGHT:
+            liquidness += 0.5;
+            std::cout << "Lquid: " << liquidness << std::endl;
+            break;
+        case OF_KEY_DOWN:
+            if (speedDampen> 0) {
+                speedDampen -= 0.5;
+            }
+            std::cout << "Speed: " << speedDampen << std::endl;
+            break;
+        case OF_KEY_UP:
+            speedDampen += 0.5;
+            std::cout << "Speed: " << speedDampen << std::endl;
             break;
             
         default:

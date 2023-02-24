@@ -1,5 +1,5 @@
 #include "ofMain.h"
-
+#include "Blip.hpp"
 
 #ifndef NoteBlob_hpp
 #define NoteBlob_hpp
@@ -10,7 +10,9 @@ public:
     glm::vec3 position;
     int size;
     ofColor color;
-    void update();
+    Blip blip;
+
+    void update(float, float);
     void draw();
     void reset();
     
@@ -18,7 +20,6 @@ public:
 //    ~Particle(); // destructor
     
 private:
-    
 };
 
 

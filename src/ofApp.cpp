@@ -1,5 +1,6 @@
 #include "ofApp.h"
-
+#define HOST "localhost"
+#define PORT 12346
 //--------------------------------------------------------------
 void ofApp::setup() {
     ofSetFrameRate(60);
@@ -7,8 +8,17 @@ void ofApp::setup() {
     ofSetVerticalSync(true);
     img.load("bach.png");
     img.resize(img.getWidth() / 1, img.getHeight() / 1);
+        oscSender.setup(HOST, PORT);
+
     
     mesh.setMode(OF_PRIMITIVE_POINTS);
+    for (int i = 0; i<10; i++) {
+        if (i == 0 ) {
+            speedChoices.push_back(1);
+        } else {
+            speedChoices.push_back(i*2);
+        }
+    }
     
     int skip = 2;
     for(int y = 0; y < img.getHeight(); y += skip) {
@@ -16,32 +26,32 @@ void ofApp::setup() {
             ofColor cur = img.getColor(x, y);
             if(cur.getBrightness() < 10) {
                 glm::vec3 pos(x, y, 0);
-                NoteBlob newNoteBlob(pos);
+                NoteBlob newNoteBlob(pos, speedChoices, oscSender);
                 noteBlobs.push_back(newNoteBlob);
             }
             else {
                 float z = 1.0;
                 cur.a == 255;
-                mesh.addColor(ofColor(0, 0, 0));
+                mesh.addColor(ofColor(10, 10, 10));
                 glm::vec3 pos(x, y, z);
                 mesh.addVertex(pos);
             }
         }
     }
+
     
     ofEnableDepthTest();
 //    glPointSize(2);
     
     liquidness = 1.0;
-    speedDampen = 20.0;
-    
+    speedDampen = 0.01;
 }
 
 //--------------------------------------------------------------
 
 void ofApp::update() {
     for (int i = 0; i<noteBlobs.size(); i++) {
-        noteBlobs[i].update(liquidness, 1.0);
+        noteBlobs[i].update(speedDampen);
     }
 }
 
@@ -79,12 +89,12 @@ void ofApp::keyPressed(int key){
             break;
         case OF_KEY_DOWN:
             if (speedDampen> 0) {
-                speedDampen -= 0.5;
+                speedDampen -= 0.001;
             }
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
         case OF_KEY_UP:
-            speedDampen += 0.5;
+            speedDampen += 0.001;
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
             

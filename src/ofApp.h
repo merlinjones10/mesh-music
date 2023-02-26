@@ -32,6 +32,10 @@ class ofApp : public ofBaseApp {
         float liquidness;
         float speedDampen;
         vector<NoteBlob> noteBlobs;
+        vector<int> speedChoices;
+    
+        ofxOscSender oscSender;
+
 
 };
 

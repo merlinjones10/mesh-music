@@ -13,15 +13,17 @@ public:
     int size;
     ofColor color;
     Blip blip;
-    ofxOscSender oscSender;
     glm::vec3 direction;
+    vector<int> speedChoices;
     int subDivSpeed; 
-    void update(float, float);
+    void update(float);
     void draw();
     void reset();
+    
+    ofxOscSender oscSender;
     void sendMesg();
     
-    NoteBlob(glm::vec3); 
+    NoteBlob(glm::vec3, vector<int>, ofxOscSender);
     
 private:
 };

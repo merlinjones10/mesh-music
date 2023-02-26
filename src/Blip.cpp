@@ -14,5 +14,6 @@ void Blip::update(){
 }
 
 void Blip::draw(){
+    ofSetColor(120);
     ofDrawCircle(position.x, position.y, position.z, size);
 }

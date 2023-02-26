@@ -13,53 +13,52 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
     color.set(ofRandom(255),ofRandom(255),ofRandom(255));
 //    oscSender.setup(HOST, PORT);
     direction = glm::vec3(0, 0, 0.1);
+    subDivSpeed = (int)ofRandom(1, 10) * 2;
+    ofLog() << subDivSpeed;
     
-
 }
 
 
-void NoteBlob::update(float liquidness, float speedDampen){
+void NoteBlob::update(float liquidness, float speed){
 //    position.z += ofSignedNoise( position.x, ofGetElapsedTimef() ,position.x) * liquidness;
     
-    float speed = 0.0;
-    // the distace is the subdivision..
-    // if the blod has to travel twice as far then it will be twice as slow... 2/4
-    // if the blob has to travel half as far it will be twice as fast... 1/8
-    if (position.z >= 5) {
-        ofLog() << "Bong";
+    int diceRoll = (int)ofRandom(100);
+    int probability = 50;
+    float boingPoint = BASE_SPEED * subDivSpeed;
+    if (position.z >= boingPoint) {
+//        ofLog() << "Bong";
         //        sendMesg();
-
         direction = glm::vec3(0, 0, -0.1);
+        position.z = position.z - 0.1;
+        if (diceRoll > probability) {
+            subDivSpeed = 1;
+        } else {
+            subDivSpeed = (int)ofRandom(1, 10) * 2;
+        }
+
         
     } else if (position.z <= 0) {
-        ofLog() << "Bing";
+//        ofLog() << "Bing";
+        blip.size = 2;
 //        sendMesg();
+        position.z = position.z + 0.1;
         direction = glm::vec3(0, 0, 0.1);
-        
+        if (diceRoll > probability) {
+            subDivSpeed = 1;
+        } else {
+            subDivSpeed = (int)ofRandom(1, 10) * 2;
+        }
+
     }
     position += direction;
-
-
-    
-    if (abs(position.z) <= 0.0) {
-        blip.size = 2;
-        ofLog() << "Bing";
-//        position.z = position.z + position.z;
-//        if (position.z > 0) {
-//            position.z = 3;
-//        } else {
-//            position.z = -3;
-//        }
-    }
-//    blip.update();
+    blip.update();
 }
 
 void NoteBlob::draw(){
     ofSetColor(color);
-//    blip.draw();
+    blip.draw();
     ofNoFill();
-//    ofSetSphereResolution(3);
-    ofDrawSphere(position, size);
+//    ofDrawSphere(position, size);
     ofFill();
 }
 

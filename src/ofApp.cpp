@@ -2,10 +2,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-    ofSetFrameRate(30);
+    ofSetFrameRate(60);
+    ofSetSphereResolution(3);
     ofSetVerticalSync(true);
-    img.load("bach2.png");
-    img.resize(img.getWidth() / 2, img.getHeight() / 2);
+    img.load("bach.png");
+    img.resize(img.getWidth() / 1, img.getHeight() / 1);
     
     mesh.setMode(OF_PRIMITIVE_POINTS);
     
@@ -29,7 +30,6 @@ void ofApp::setup() {
     }
     
     ofEnableDepthTest();
-//    glEnable(GL_POINT_SMOOTH);
 //    glPointSize(2);
     
     liquidness = 1.0;
@@ -40,25 +40,21 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 
 void ofApp::update() {
-    noteBlobs[1].update(liquidness, speedDampen);
-
-//    for (int i = 0; i<noteBlobs.size(); i++) {
-//        noteBlobs[i].update(liquidness, speedDampen);
-//    }
+    for (int i = 0; i<noteBlobs.size(); i++) {
+        noteBlobs[i].update(liquidness, 1.0);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-//    ofBackground(0,0,0);
+    ofBackground(0,0,0);
     cam.begin();
-    ofScale(2, -2, 2); // flip the y axis and zoom in a bit
-    //    ofRotateYDeg(90);
+    ofScale(2, -2, 2);
     ofTranslate(-img.getWidth() / 2, -img.getHeight() / 2);
     mesh.draw();
-    noteBlobs[1].draw();
-//    for (int i = 0; i<noteBlobs.size(); i++) {
-//        noteBlobs[i].draw();
-//    }
+    for (int i = 0; i<noteBlobs.size(); i++) {
+        noteBlobs[i].draw();
+    }
     cam.end();
 }
 

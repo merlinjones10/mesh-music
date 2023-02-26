@@ -32,5 +32,6 @@ class ofApp : public ofBaseApp {
         float liquidness;
         float speedDampen;
         vector<NoteBlob> noteBlobs;
+
 };
 

@@ -9,7 +9,7 @@ Blip::Blip(glm::vec3 pos) {
 
 void Blip::update(){
     if (size > 0.001 ) {
-        size -=0.1;
+        size -=0.05;
     }
 }
 

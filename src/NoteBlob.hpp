@@ -15,9 +15,7 @@ public:
     Blip blip;
     ofxOscSender oscSender;
     glm::vec3 direction;
-
-
-
+    int subDivSpeed; 
     void update(float, float);
     void draw();
     void reset();

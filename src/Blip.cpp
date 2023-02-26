@@ -14,5 +14,5 @@ void Blip::update(){
 }
 
 void Blip::draw(){
-    ofDrawCircle(position.x, position.y, size);
+    ofDrawCircle(position.x, position.y, position.z, size);
 }

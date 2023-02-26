@@ -4,7 +4,7 @@
 #include "NoteBlob.hpp"
 #include "ofxOsc.h"
 
-
+#define BASE_SPEED 10
 
 
 class ofApp : public ofBaseApp {

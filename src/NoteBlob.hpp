@@ -14,6 +14,8 @@ public:
     ofColor color;
     Blip blip;
     ofxOscSender oscSender;
+    glm::vec3 direction;
+
 
 
     void update(float, float);

@@ -1,4 +1,5 @@
 #include "ofMain.h"
+#include "ofApp.h"
 #include "NoteBlob.hpp"
 #include "Blip.hpp"
 #include "ofxOsc.h"
@@ -10,17 +11,39 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
     position = pos;
     size = 1;
     color.set(ofRandom(255),ofRandom(255),ofRandom(255));
-    oscSender.setup(HOST, PORT);
+//    oscSender.setup(HOST, PORT);
+    direction = glm::vec3(0, 0, 0.1);
+    
+
 }
 
 
 void NoteBlob::update(float liquidness, float speedDampen){
-    position.z += ofSignedNoise( position.x, ofGetElapsedTimef() ,position.x) * liquidness;
+//    position.z += ofSignedNoise( position.x, ofGetElapsedTimef() ,position.x) * liquidness;
+    
+    float speed = 0.0;
+    // the distace is the subdivision..
+    // if the blod has to travel twice as far then it will be twice as slow... 2/4
+    // if the blob has to travel half as far it will be twice as fast... 1/8
+    if (position.z >= 5) {
+        ofLog() << "Bong";
+        //        sendMesg();
+
+        direction = glm::vec3(0, 0, -0.1);
+        
+    } else if (position.z <= 0) {
+        ofLog() << "Bing";
+//        sendMesg();
+        direction = glm::vec3(0, 0, 0.1);
+        
+    }
+    position += direction;
+
 
     
-    if (abs(position.z) < 0.2) {
+    if (abs(position.z) <= 0.0) {
         blip.size = 2;
-        sendMesg();
+        ofLog() << "Bing";
 //        position.z = position.z + position.z;
 //        if (position.z > 0) {
 //            position.z = 3;
@@ -28,15 +51,15 @@ void NoteBlob::update(float liquidness, float speedDampen){
 //            position.z = -3;
 //        }
     }
-    blip.update();
+//    blip.update();
 }
 
 void NoteBlob::draw(){
     ofSetColor(color);
-    blip.draw();
+//    blip.draw();
     ofNoFill();
 //    ofSetSphereResolution(3);
-//    ofDrawSphere(position, size);
+    ofDrawSphere(position, size);
     ofFill();
 }
 
@@ -45,12 +68,10 @@ void NoteBlob::reset(){
 }
 
 void NoteBlob::sendMesg(){
-    ofxOscMessage m;
-    m.setAddress("/blip/position");
-    
-    m.addIntArg(position.x);
-    m.addIntArg(position.y);
-    oscSender.sendMessage(m, false);
-
-    
+//    ofxOscMessage m;
+//    m.setAddress("/blip/position");
+//
+//    m.addIntArg(position.x);
+//    m.addIntArg(position.y);
+//    oscSender.sendMessage(m, false);
 }

@@ -2,6 +2,10 @@
 
 #include "ofMain.h"
 #include "NoteBlob.hpp"
+#include "ofxOsc.h"
+
+
+
 
 class ofApp : public ofBaseApp {
     public:

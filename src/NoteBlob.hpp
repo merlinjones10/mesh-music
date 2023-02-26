@@ -1,5 +1,7 @@
 #include "ofMain.h"
 #include "Blip.hpp"
+#include "ofxOsc.h"
+
 
 #ifndef NoteBlob_hpp
 #define NoteBlob_hpp
@@ -11,13 +13,15 @@ public:
     int size;
     ofColor color;
     Blip blip;
+    ofxOscSender oscSender;
+
 
     void update(float, float);
     void draw();
     void reset();
+    void sendMesg();
     
-    NoteBlob(glm::vec3); // constructor
-//    ~Particle(); // destructor
+    NoteBlob(glm::vec3); 
     
 private:
 };

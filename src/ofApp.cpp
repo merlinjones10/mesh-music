@@ -5,10 +5,11 @@ void ofApp::setup() {
     ofSetFrameRate(30);
     ofSetVerticalSync(true);
     img.load("bach.png");
+    img.resize(img.getWidth() / 1, img.getHeight() / 1);
     
     mesh.setMode(OF_PRIMITIVE_POINTS);
     
-    int skip = 1;
+    int skip = 2;
     for(int y = 0; y < img.getHeight(); y += skip) {
         for(int x = 0; x < img.getWidth() -1; x += skip) {
             ofColor cur = img.getColor(x, y);
@@ -29,7 +30,7 @@ void ofApp::setup() {
     
     ofEnableDepthTest();
     glEnable(GL_POINT_SMOOTH);
-    glPointSize(6); 
+    glPointSize(2);
     
     liquidness = 1.0;
     speedDampen = 20.0;
@@ -45,12 +46,12 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-    ofBackground(50,60,60);
+    ofBackground(0,0,0);
     cam.begin();
     ofScale(2, -2, 2); // flip the y axis and zoom in a bit
     //    ofRotateYDeg(90);
     ofTranslate(-img.getWidth() / 2, -img.getHeight() / 2);
-    mesh.draw();
+//    mesh.draw();
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }

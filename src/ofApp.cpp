@@ -3,14 +3,13 @@
 #define PORT 12346
 //--------------------------------------------------------------
 void ofApp::setup() {
-    ofSetFrameRate(60);
-    ofSetSphereResolution(3);
+    ofSetFrameRate(30);
+    ofSetSphereResolution(10);
     ofSetVerticalSync(true);
     img.load("bach.png");
-    img.resize(img.getWidth() / 1, img.getHeight() / 1);
-        oscSender.setup(HOST, PORT);
+    img.resize(img.getWidth() / 2, img.getHeight() / 2);
+    oscSender.setup(HOST, PORT);
 
-    
     mesh.setMode(OF_PRIMITIVE_POINTS);
     for (int i = 0; i<10; i++) {
         if (i == 0 ) {
@@ -20,13 +19,13 @@ void ofApp::setup() {
         }
     }
     
-    int skip = 2;
+    int skip = 1;
     for(int y = 0; y < img.getHeight(); y += skip) {
         for(int x = 0; x < img.getWidth() -1; x += skip) {
             ofColor cur = img.getColor(x, y);
             if(cur.getBrightness() < 10) {
                 glm::vec3 pos(x, y, 0);
-                NoteBlob newNoteBlob(pos, speedChoices, oscSender);
+                NoteBlob newNoteBlob(pos, speedChoices);
                 noteBlobs.push_back(newNoteBlob);
             }
             else {
@@ -39,7 +38,7 @@ void ofApp::setup() {
         }
     }
 
-    
+    ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
     ofEnableDepthTest();
 //    glPointSize(2);
     
@@ -48,6 +47,13 @@ void ofApp::setup() {
 }
 
 //--------------------------------------------------------------
+void ofApp::onBangInAnyBlob(glm::vec3 & e){
+        ofxOscMessage m;
+        m.setAddress("/blip/position");
+        m.addIntArg(e.x);
+        m.addIntArg(e.y);
+        oscSender.sendMessage(m, false);
+}
 
 void ofApp::update() {
     for (int i = 0; i<noteBlobs.size(); i++) {
@@ -61,7 +67,7 @@ void ofApp::draw() {
     cam.begin();
     ofScale(2, -2, 2);
     ofTranslate(-img.getWidth() / 2, -img.getHeight() / 2);
-    mesh.draw();
+//    mesh.draw();
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }

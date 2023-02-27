@@ -13,7 +13,7 @@ void Blip::update(){
     }
 }
 
-void Blip::draw(){
+void Blip::draw(glm::vec3 position){
     ofSetColor(120);
     ofDrawCircle(position.x, position.y, position.z, size);
 }

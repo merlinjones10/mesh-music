@@ -19,11 +19,11 @@ public:
     void update(float);
     void draw();
     void reset();
-    
-    ofxOscSender oscSender;
     void sendMesg();
     
-    NoteBlob(glm::vec3, vector<int>, ofxOscSender);
+    static ofEvent<glm::vec3> onBlobBangGlobal;
+
+    NoteBlob(glm::vec3, vector<int>);
     
 private:
 };

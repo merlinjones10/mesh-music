@@ -35,6 +35,9 @@ class ofApp : public ofBaseApp {
         vector<int> speedChoices;
     
         ofxOscSender oscSender;
+    
+    void onBangInAnyBlob(glm::vec3 & e);
+
 
 
 };

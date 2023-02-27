@@ -10,7 +10,7 @@ public:
     ofColor color;
     void setup();
     void update();
-    void draw();
+    void draw(glm::vec3);
     void reset();
     
     Blip(glm::vec3);

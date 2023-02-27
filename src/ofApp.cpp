@@ -13,6 +13,7 @@ void ofApp::setup() {
     mesh.setMode(OF_PRIMITIVE_POINTS);
     for (int i = 0; i<10; i++) {
         if (i == 0 ) {
+            
             speedChoices.push_back(1);
         } else {
             speedChoices.push_back(i*2);

@@ -6,37 +6,45 @@
 
 ofEvent<glm::vec3> NoteBlob::onBlobBangGlobal = ofEvent<glm::vec3>();
 
-NoteBlob::NoteBlob(glm::vec3 pos, vector<int> _speedChoices) : blip(pos) {
+bool rollDice(float probability){
+    return ofRandom(100) > probability;
+}
+
+vector<int> NoteBlob::s_subDivChoices = {1 ,2 ,4 ,6 ,8 };
+int NoteBlob::s_baseDistance = 18;
+float NoteBlob::s_tempo = 1.0 / 64.0;
+
+NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
     position = pos;
     size = 1;
-    direction = glm::vec3(0, 0, 0.1);
-    speedChoices = _speedChoices;
-//    subDivSpeed = _speedChoices[(int)ofRandom(_speedChoices.size() - 1)];
-    subDivSpeed = _speedChoices[4];
-    float speed = 0.01 * subDivSpeed;
+    direction = glm::vec3(0, 0, s_tempo);
+    subDiv = s_subDivChoices[4]; // start first uniform
+    speed = s_tempo * subDiv;
     color.setHsb(80, ofRandom(200), ofRandom(255), 200);
 }
 
-
-void NoteBlob::update(float speedDampen){
-    float boingPoint = BASE_SPEED * 3;
-    float speed = speedDampen * subDivSpeed;
-    float mappedBrightness = ofMap(speed, 0.01, 0.01*speedChoices.back(), 10, 255);
-    if (position.z >= boingPoint) {
+void NoteBlob::update(float var1){
+    if (position.z >= s_baseDistance) {
         blip.size = 2;
         sendMesg();
-        direction = glm::vec3(0, 0, -speed);
         position.z = position.z - speed;
-//        subDivSpeed = speedChoices[(int)ofRandom(speedChoices.size() - 1)];
+        
+        subDiv = s_subDivChoices[(int)ofRandom(s_subDivChoices.size() - 1)];
+        speed = s_tempo * subDiv;
+        
+        if (rollDice(99.5)) {
+            speed = ofRandom(0.5, 3.0);
+            ofLog() << speed;
+        }
+        
+//        direction = glm::vec3(0, 0, speed);
+        direction = glm::vec3(0, 0, -speed);
+
         color.setHsb(ofRandom(70, 100), ofRandom(100), ofRandom(100), 200);
 
-        
     } else if (position.z <= 0) {
-//        blip.size = 2;
-//        sendMesg();
         position.z = position.z + speed;
         direction = glm::vec3(0, 0, speed);
-        subDivSpeed = speedChoices[(int)ofRandom(speedChoices.size() - 1)];
         color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
 
     }
@@ -52,17 +60,11 @@ void NoteBlob::draw(){
 }
 
 void NoteBlob::reset(){
-    position.z = -1.0;
+    position.z = (s_baseDistance * 3) - 0.5;
+    direction = glm::vec3(0, 0, 1);
+
 }
 
 void NoteBlob::sendMesg(){
     ofNotifyEvent(onBlobBangGlobal, position);
-
-//    ofxOscMessage m;
-//    m.setAddress("/blip/position");
-////
-//    m.addIntArg(position.x);
-//    m.addIntArg(position.y);
-//    oscSender.sendMessage(m, false);
-
 }

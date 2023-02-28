@@ -8,22 +8,27 @@
 
 class NoteBlob {
 public:
-
-    glm::vec3 position;
-    int size;
-    ofColor color;
+    NoteBlob(glm::vec3);
     Blip blip;
+
+    ofColor color;
+    glm::vec3 position;
     glm::vec3 direction;
-    vector<int> speedChoices;
-    int subDivSpeed; 
+    
+    int size;
+    int subDiv;
+    float speed; 
+
     void update(float);
     void draw();
     void reset();
     void sendMesg();
     
     static ofEvent<glm::vec3> onBlobBangGlobal;
+    static vector<int> s_subDivChoices;
+    static int s_baseDistance;
+    static float s_tempo;
 
-    NoteBlob(glm::vec3, vector<int>);
     
 private:
 };

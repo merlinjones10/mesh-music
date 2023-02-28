@@ -4,9 +4,6 @@
 #include "NoteBlob.hpp"
 #include "ofxOsc.h"
 
-#define BASE_SPEED 10
-
-
 class ofApp : public ofBaseApp {
     public:
         void setup();
@@ -31,8 +28,8 @@ class ofApp : public ofBaseApp {
     
         float liquidness;
         float speedDampen;
+    
         vector<NoteBlob> noteBlobs;
-        vector<int> speedChoices;
     
         ofxOscSender oscSender;
     

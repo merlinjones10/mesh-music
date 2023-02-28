@@ -4,29 +4,21 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
     ofSetFrameRate(30);
-    ofSetSphereResolution(10);
+//    ofSetSphereResolution(10);
+//    glPointSize(2);
     ofSetVerticalSync(true);
     img.load("bach.png");
     img.resize(img.getWidth() / 2, img.getHeight() / 2);
     oscSender.setup(HOST, PORT);
-
     mesh.setMode(OF_PRIMITIVE_POINTS);
-    for (int i = 0; i<10; i++) {
-        if (i == 0 ) {
-            
-            speedChoices.push_back(1);
-        } else {
-            speedChoices.push_back(i*2);
-        }
-    }
     
     int skip = 1;
     for(int y = 0; y < img.getHeight(); y += skip) {
         for(int x = 0; x < img.getWidth() -1; x += skip) {
             ofColor cur = img.getColor(x, y);
             if(cur.getBrightness() < 10) {
-                glm::vec3 pos(x, y, 0);
-                NoteBlob newNoteBlob(pos, speedChoices);
+                glm::vec3 pos(x, y, 22);
+                NoteBlob newNoteBlob(pos);
                 noteBlobs.push_back(newNoteBlob);
             }
             else {
@@ -41,7 +33,6 @@ void ofApp::setup() {
 
     ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
     ofEnableDepthTest();
-//    glPointSize(2);
     
     liquidness = 1.0;
     speedDampen = 0.01;
@@ -68,7 +59,7 @@ void ofApp::draw() {
     cam.begin();
     ofScale(2, -2, 2);
     ofTranslate(-img.getWidth() / 2, -img.getHeight() / 2);
-//    mesh.draw();
+    mesh.draw();
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }

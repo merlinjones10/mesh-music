@@ -13,7 +13,7 @@ void Blip::update(){
     if (size >= 2.0) {
         color.setHsb(ofRandom(40, 50), 10, 255);
 //        position.z -=
-        fallSpeed = ofRandom(0.5, 1.0);
+        fallSpeed = ofRandom(0.5, 5.0);
     }
     if (size > 0.001 ) {
         size -=0.05;
@@ -28,7 +28,7 @@ void Blip::update(){
 void Blip::draw(glm::vec3 parentPosition){
     ofSetColor(color);
     if (size > 0.001) {
-        ofDrawSphere(position, 1);
+        ofDrawSphere(position, size);
         ofDrawCircle(position.x, position.y, 1, size / 1.5);
 
     }

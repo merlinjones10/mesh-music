@@ -1,23 +1,26 @@
 #include "ofApp.h"
 #define HOST "localhost"
 #define PORT 12346
+#define SCALE 3
 //--------------------------------------------------------------
 void ofApp::setup() {
     ofSetFrameRate(30);
 //    ofSetSphereResolution(10);
 //    glPointSize(2);
     ofSetVerticalSync(true);
-    img.load("bach2.png");
-    img.resize(img.getWidth() / 3, img.getHeight() / 3);
+    img.load("bach.png");
+    img.resize(img.getWidth() / 1, img.getHeight() / 1);
     oscSender.setup(HOST, PORT);
     mesh.setMode(OF_PRIMITIVE_POINTS);
     
+    // when the thing is created, add it to the mesh at a skipped rate, * 2
+    // so every 2 pixels
     int skip = 1;
     for(int y = 0; y < img.getHeight(); y += skip) {
         for(int x = 0; x < img.getWidth() -1; x += skip) {
             ofColor cur = img.getColor(x, y);
             if(cur.getBrightness() < 10) {
-                glm::vec3 pos(x, y, 22);
+                glm::vec3 pos(x * SCALE, y * SCALE, 22);
                 NoteBlob newNoteBlob(pos);
                 noteBlobs.push_back(newNoteBlob);
             }
@@ -25,7 +28,7 @@ void ofApp::setup() {
                 float z = 1.0;
                 cur.a == 255;
                 mesh.addColor(ofColor(10, 10, 10));
-                glm::vec3 pos(x, y, z);
+                glm::vec3 pos(x * SCALE, y * SCALE, z * SCALE);
                 mesh.addVertex(pos);
             }
         }
@@ -59,7 +62,7 @@ void ofApp::update() {
 void ofApp::draw() {
     cam.begin();
     ofScale(2, -2, 2);
-    ofTranslate(-img.getWidth() / 2, -img.getHeight() / 2);
+    ofTranslate(-img.getWidth() * SCALE / 2, -img.getHeight() * SCALE / 2 );
     mesh.draw();
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();

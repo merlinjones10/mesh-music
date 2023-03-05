@@ -8,6 +8,7 @@ public:
     glm::vec3 position;
     float size;
     ofColor color;
+    float fallSpeed; 
     void setup();
     void update();
     void draw(glm::vec3);

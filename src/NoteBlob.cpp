@@ -26,6 +26,7 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
 void NoteBlob::update(float var1){
     if (position.z >= s_baseDistance) {
         blip.size = 2;
+        blip.position.z = 1;
         sendMesg();
         position.z = position.z - speed;
         
@@ -34,7 +35,6 @@ void NoteBlob::update(float var1){
         
         if (rollDice(99.5)) {
             speed = ofRandom(0.5, 3.0);
-            ofLog() << speed;
         }
         
 //        direction = glm::vec3(0, 0, speed);

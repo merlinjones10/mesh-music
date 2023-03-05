@@ -7,8 +7,8 @@ void ofApp::setup() {
 //    ofSetSphereResolution(10);
 //    glPointSize(2);
     ofSetVerticalSync(true);
-    img.load("bach.png");
-    img.resize(img.getWidth() / 2, img.getHeight() / 2);
+    img.load("bach2.png");
+    img.resize(img.getWidth() / 3, img.getHeight() / 3);
     oscSender.setup(HOST, PORT);
     mesh.setMode(OF_PRIMITIVE_POINTS);
     
@@ -33,9 +33,11 @@ void ofApp::setup() {
 
     ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
     ofEnableDepthTest();
-    
+    ofEnableAlphaBlending();
     liquidness = 1.0;
     speedDampen = 0.01;
+    ofBackground(0,0,0);
+
 }
 
 //--------------------------------------------------------------
@@ -55,7 +57,6 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-    ofBackground(0,0,0);
     cam.begin();
     ofScale(2, -2, 2);
     ofTranslate(-img.getWidth() / 2, -img.getHeight() / 2);

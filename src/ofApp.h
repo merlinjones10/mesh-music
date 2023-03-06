@@ -25,6 +25,7 @@ class ofApp : public ofBaseApp {
         ofEasyCam cam;
         ofMesh mesh;
         ofImage img;
+    bool learn;
     
         float liquidness;
         float speedDampen;
@@ -34,6 +35,12 @@ class ofApp : public ofBaseApp {
         ofxOscSender oscSender;
     
     void onBangInAnyBlob(glm::vec3 & e);
+    
+    ofVideoGrabber vidGrabber;
+    ofPixels videoInverted;
+    ofTexture videoTexture;
+    int camWidth;
+    int camHeight;
 
 
 

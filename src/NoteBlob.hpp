@@ -12,6 +12,7 @@ public:
     Blip blip;
 
     ofColor color;
+    bool bang; 
     glm::vec3 position;
     glm::vec3 direction;
     
@@ -23,7 +24,7 @@ public:
     void draw();
     void reset();
     void sendMesg();
-    
+    void setBang(bool);
     static ofEvent<glm::vec3> onBlobBangGlobal;
     static vector<int> s_subDivChoices;
     static int s_baseDistance;

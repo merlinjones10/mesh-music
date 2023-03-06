@@ -35,6 +35,9 @@ class ofApp : public ofBaseApp {
         ofxOscSender oscSender;
     
     void onBangInAnyBlob(glm::vec3 & e);
+    float startTime;
+    float timerInterval;
+    float beatTicker; 
     
     ofVideoGrabber vidGrabber;
     ofPixels videoInverted;

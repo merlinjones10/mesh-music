@@ -12,48 +12,63 @@ bool rollDice(float probability){
 
 vector<int> NoteBlob::s_subDivChoices = {1 ,2 ,4 ,6 ,8 };
 int NoteBlob::s_baseDistance = 18;
-float NoteBlob::s_tempo = 1.0 / 64.0;
+float NoteBlob::s_tempo = 1.0 / 128.0;
 
 NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
     position = pos;
     size = 1;
-    direction = glm::vec3(0, 0, s_tempo);
-    subDiv = s_subDivChoices[4]; // start first uniform
+    direction = glm::vec3(0, 0, 0);
+    subDiv = s_subDivChoices[4];
     speed = s_tempo * subDiv;
-    color.setHsb(80, ofRandom(200), ofRandom(255), 200);
+    color.setHsb(100, ofRandom(200), ofRandom(255), 200);
     bang = false;
 }
 
 void NoteBlob::update(float var1){
     if (bang) {
-        color.setHsb(ofGetElapsedTimef(), ofRandom(200), ofRandom(255), 200);
+        color.setHsb(ofRandom(80, 100), ofRandom(200), ofRandom(255), 200);
         blip.size = 2;
         blip.position.z = 1;
         sendMesg();
         bang = false;
     }
-    position += direction;
-    blip.update();
-//    if (position.z >= s_baseDistance) {
-//        blip.size = 2;
+    
+    float noise = ofSignedNoise(ofGetElapsedTimef() * 2.0 ,position.y);
+    if (noise > 0.88) {
+        color.setHsb(ofRandom(80, 100), ofRandom(200), ofRandom(255), 200);
+        blip.size = 2;
+        sendMesg();
 //        blip.position.z = 1;
-//        sendMesg();
-//        position.z = position.z - speed;
-//        subDiv = s_subDivChoices[(int)ofRandom(s_subDivChoices.size() - 1)];
-//        speed = s_tempo * subDiv;
-//
-//        if (rollDice(99.5)) {
-//            speed = ofRandom(0.5, 3.0);
-//        }
-//        direction = glm::vec3(0, 0, -speed);
-//        color.setHsb(ofRandom(70, 100), ofRandom(100), ofRandom(100), 200);
-//
-//    } else if (position.z <= 0) {
-//        position.z = position.z + speed;
-//        direction = glm::vec3(0, 0, speed);
-//        color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
-//    }
-//    position += direction;
+//        position.y = 1;
+//        position.x = 1;
+        bang = false;
+    }
+
+    if (1+1 == 3) { // regular burn animation
+        ofLog() << "OIoio" ;
+        direction = glm::vec3(0, 0, s_tempo);
+        if (position.z >= s_baseDistance) {
+            blip.size = 2;
+            blip.position.z = 1;
+            sendMesg();
+            position.z = position.z - speed;
+            subDiv = s_subDivChoices[(int)ofRandom(s_subDivChoices.size() - 1)];
+            speed = s_tempo * subDiv;
+            
+            if (rollDice(99.5)) {
+                speed = ofRandom(0.5, 3.0);
+            }
+            direction = glm::vec3(0, 0, -speed);
+            color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
+
+        } else if (position.z <= 0) {
+            position.z = position.z + speed;
+            direction = glm::vec3(0, 0, speed);
+            color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
+        }
+        position += direction;
+    }
+    blip.update();
 }
 
 void NoteBlob::draw(){

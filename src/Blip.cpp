@@ -2,16 +2,15 @@
 #include "Blip.hpp"
 
 Blip::Blip(glm::vec3 pos) {
-    position = pos;
+    position = glm::vec3(pos.x, pos.y, 0.5);
     size = 0;
-//    color.set(ofRandom(255),ofRandom(255),ofRandom(255));
     color.setHsb(ofRandom(100, 150), 255, 255);
     fallSpeed = ofRandom(0.5, 1.0);
 }
 
 void Blip::update(){
     if (size >= 2.0) {
-        color.setHsb(ofRandom(ofGetElapsedTimef(), ofGetElapsedTimef() + 10), 255, 255);
+        color.setHsb(ofRandom(ofRandom(50, 120), ofGetElapsedTimef() + 10), 255, 255);
         fallSpeed = ofRandom(0.5, 5.0);
     }
     if (size > 0.001 ) {
@@ -32,5 +31,3 @@ void Blip::draw(glm::vec3 parentPosition){
 
     }
 }
-// work on falling star effect
-// work on brighness > fade and nice colors

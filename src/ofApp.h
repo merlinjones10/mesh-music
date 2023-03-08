@@ -37,7 +37,9 @@ class ofApp : public ofBaseApp {
     void onBangInAnyBlob(glm::vec3 & e);
     float startTime;
     float timerInterval;
-    float beatTicker; 
+    float beatTicker;
+    int mode;
+    bool elapsedBeat;
     
     ofVideoGrabber vidGrabber;
     ofPixels videoInverted;

@@ -6,13 +6,11 @@
 void ofApp::setup() {
     ofSetFrameRate(30);
     ofSetSphereResolution(6);
-//    glPointSize(2);
-//    img.load("bach.png");
-//    img.resize(img.getWidth() / 1, img.getHeight() / 1);
+    //    glPointSize(2);
     oscSender.setup(HOST, PORT);
     mesh.setMode(OF_PRIMITIVE_POINTS);
     
-    camWidth = 320 ;  // try to grab at this size.
+    camWidth = 320 ;
     camHeight = 240;
     vector<ofVideoDevice> devices = vidGrabber.listDevices();
     for(size_t i = 0; i < devices.size(); i++){
@@ -28,49 +26,47 @@ void ofApp::setup() {
     vidGrabber.setDeviceID(0);
     vidGrabber.setDesiredFrameRate(30);
     vidGrabber.setup(camWidth, camHeight);
-
+    
     videoInverted.allocate(vidGrabber.getWidth(), vidGrabber.getHeight(), OF_PIXELS_RGB);
     videoTexture.allocate(videoInverted);
     img.setFromPixels(vidGrabber.getPixels());
-
+    
     
     learn = true;
     ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
-//    ofEnableDepthTest();
+    //    ofEnableDepthTest();
     ofSetVerticalSync(true);
     ofEnableAlphaBlending();
     liquidness = 1.0;
-    speedDampen = 1.0;
-//    ofBackground(0,0,0);
+    speedDampen = 70.0;
+    //    ofBackground(0,0,0);
     startTime = ofGetElapsedTimeMillis();
     timerInterval = 125;
     beatTicker = 0.0;
     std::cout << ofGetElapsedTimeMillis() << '\n';
+    mode = 0;
 }
 
 //--------------------------------------------------------------
 void ofApp::onBangInAnyBlob(glm::vec3 & e){
-        ofxOscMessage m;
-        m.setAddress("/blip/position");
-        m.addIntArg(e.x);
-        m.addIntArg(e.y);
-        oscSender.sendMessage(m, false);
+    ofxOscMessage m;
+    m.setAddress("/blip/position");
+    m.addIntArg(e.x);
+    m.addIntArg(e.y);
+    oscSender.sendMessage(m, false);
 }
-bool rollDice(float probability){
-    return ofRandom(100) > probability;
-}
+
 void ofApp::update() {
-
     vidGrabber.update();
-
+    
     if (learn) {
-        float threshold = 90.0;
+        float threshold = speedDampen;
         mesh.clear();
         noteBlobs.clear();
         if(vidGrabber.isFrameNew()){
             ofPixels & pixels = vidGrabber.getPixels();
             pixels.resize(pixels.getWidth() / 2, pixels.getHeight() / 2);
-
+            
             int skip = 1;
             for(int y = 0; y < pixels.getHeight(); y += skip) {
                 for(int x = 0; x < pixels.getWidth(); x += skip) {
@@ -87,43 +83,50 @@ void ofApp::update() {
                         tempCol.setHsb(0, 0, 255);
                         tempCol.a = 1.0;
                         pixels.setColor(x, y, tempCol);
-//                        float z = 0.0;
-//                        cur.a == 255;
-//                        mesh.addColor(ofColor(10, 10, 10));
-//                        glm::vec3 pos(x , -y , z );
-//                        mesh.addVertex(pos);
+                        //                        float z = 0.0;
+                        //                        cur.a == 255;
+                        //                        mesh.addColor(ofColor(10, 10, 10));
+                        //                        glm::vec3 pos(x , -y , z );
+                        //                        mesh.addVertex(pos);
                     }
                 }
             }
             img.setFromPixels(pixels);
+            ofxOscMessage m;
+            m.setAddress("/minmax/y");
+            m.addIntArg(noteBlobs[0].position.y);
+            m.addIntArg(noteBlobs.back().position.y);
+            oscSender.sendMessage(m, false);
         }
         learn = false;
     }
-
-    //
     float timer = ofGetElapsedTimeMillis() - startTime;
     float count = (int)beatTicker % (int)img.getWidth();
-
-    
     if (timer >= timerInterval) {
-        if (noteBlobs.size() > 0) {
-            if (ofRandom(100) < 50) {
-                noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
-            }
-            if (ofRandom(100) < 25) {
-                noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
-            }
-            if (ofRandom(100) < 10) {
-                noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
+        //        elapsedBeat = true;
+        if (mode == 0) {
+            if (noteBlobs.size() > 0) {
+                if (ofRandom(100) < 10) {
+                    noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
+                }
+                if (ofRandom(100) < 2) {
+                    noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
+                }
+                if (ofRandom(100) < 5) {
+                    noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
+                }
             }
         }
-//        for (int i = 0; i<noteBlobs.size(); i++) {
-//            noteBlobs[i].setBang(true);
-//        }
+        if (mode == 1) {
+            for (int i = 0; i<noteBlobs.size(); i++) {
+                if (noteBlobs[i].position.x  == count) {
+                    noteBlobs[i].setBang(true);
+                }
+            }
+        }
         beatTicker++;
         startTime = ofGetElapsedTimeMillis();
     }
-    
     // regular update
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].update(count);
@@ -134,11 +137,11 @@ void ofApp::update() {
 void ofApp::draw() {
     cam.begin();
     ofTranslate(-img.getWidth() / 2, img.getHeight()/ 2);
-
+    
     ofSetColor(255);
     img.draw(0,-img.getHeight());
-
-//    mesh.draw();
+    
+    //    mesh.draw();
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }
@@ -160,14 +163,14 @@ void ofApp::keyPressed(int key){
             break;
             
         case OF_KEY_LEFT:
-//            if (liquidness > 0) {
-                liquidness -= 1.0;
-//            }
-            std::cout << "Lquid: " << liquidness << std::endl;
+            if (mode > 0) {
+                mode -= 1;
+            }
+            std::cout << "mode: " << liquidness << std::endl;
             break;
         case OF_KEY_RIGHT:
-            liquidness += 1.0;
-            std::cout << "Lquid: " << liquidness << std::endl;
+            mode += 1;
+            std::cout << "mode: " << liquidness << std::endl;
             break;
         case OF_KEY_DOWN:
             if (speedDampen> 0) {

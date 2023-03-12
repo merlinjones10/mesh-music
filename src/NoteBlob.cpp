@@ -25,49 +25,39 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
 }
 
 void NoteBlob::update(float var1){
-    if (bang) {
-        color.setHsb(ofRandom(80, 100), ofRandom(200), ofRandom(255), 200);
-        blip.size = 2;
-        blip.position.z = 1;
-        sendMesg();
-        bang = false;
-    }
     
-    float noise = ofSignedNoise(ofGetElapsedTimef() * 2.0 ,position.y);
-    if (noise > 0.88) {
-        color.setHsb(ofRandom(80, 100), ofRandom(200), ofRandom(255), 200);
-        blip.size = 2;
-        sendMesg();
-//        blip.position.z = 1;
-//        position.y = 1;
-//        position.x = 1;
-        bang = false;
-    }
-
-    if (1+1 == 3) { // regular burn animation
-        ofLog() << "OIoio" ;
-        direction = glm::vec3(0, 0, s_tempo);
-        if (position.z >= s_baseDistance) {
-            blip.size = 2;
-            blip.position.z = 1;
-            sendMesg();
-            position.z = position.z - speed;
-            subDiv = s_subDivChoices[(int)ofRandom(s_subDivChoices.size() - 1)];
-            speed = s_tempo * subDiv;
-            
-            if (rollDice(99.5)) {
-                speed = ofRandom(0.5, 3.0);
-            }
-            direction = glm::vec3(0, 0, -speed);
-            color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
-
-        } else if (position.z <= 0) {
-            position.z = position.z + speed;
-            direction = glm::vec3(0, 0, speed);
-            color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
-        }
-        position += direction;
-    }
+    
+    ofVec3f p1(position);
+    ofVec3f p2(position.x, position.y, 0.0);
+    float distance = p1.distance(p2);
+    if (distance < 0.05) {
+        setBang(true);
+    };
+    
+    //    if (1+1 == 3) { // regular burn animation
+    //        ofLog() << "OIoio" ;
+    //        direction = glm::vec3(0, 0, s_tempo);
+    //        if (position.z >= s_baseDistance) {
+    //            blip.size = 2;
+    //            blip.position.z = 1;
+    //            sendMesg();
+    //            position.z = position.z - speed;
+    //            subDiv = s_subDivChoices[(int)ofRandom(s_subDivChoices.size() - 1)];
+    //            speed = s_tempo * subDiv;
+    //
+    //            if (rollDice(99.5)) {
+    //                speed = ofRandom(0.5, 3.0);
+    //            }
+    //            direction = glm::vec3(0, 0, -speed);
+    //            color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
+    //
+    //        } else if (position.z <= 0) {
+    //            position.z = position.z + speed;
+    //            direction = glm::vec3(0, 0, speed);
+    //            color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
+    //        }
+    //        position += direction;
+    //    }
     blip.update();
 }
 
@@ -84,7 +74,11 @@ void NoteBlob::reset(){
 }
 
 void NoteBlob::setBang(bool value){
-    bang = value;
+    // rmv param?
+    color.setHsb(ofRandom(80, 100), ofRandom(200), ofRandom(255), 200);
+    blip.size = 2;
+    blip.position.z = 1;
+    sendMesg();
 }
 
 void NoteBlob::sendMesg(){

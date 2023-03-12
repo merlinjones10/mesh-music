@@ -2,7 +2,7 @@
 #include "Blip.hpp"
 
 Blip::Blip(glm::vec3 pos) {
-    position = glm::vec3(pos.x, pos.y, 0.5);
+    position = glm::vec3(pos.x, pos.y, 0);
     size = 0;
     color.setHsb(ofRandom(100, 150), 255, 255);
     fallSpeed = ofRandom(0.5, 1.0);
@@ -10,6 +10,7 @@ Blip::Blip(glm::vec3 pos) {
 
 void Blip::update(){
     if (size >= 2.0) {
+        position.z = 0;
         color.setHsb(ofRandom(ofRandom(50, 120), ofGetElapsedTimef() + 10), 255, 255);
         fallSpeed = ofRandom(0.5, 5.0);
     }
@@ -17,8 +18,6 @@ void Blip::update(){
         size -=0.05;
         position.z += fallSpeed;
         color.setBrightness(color.getBrightness() - 10.0);
-//        color.setSaturation(color.getSaturation() + 10.0);
-//        color.(color, count);
         color.setHsb(color.getHue(),color.getSaturation(), color.getBrightness());
     }
 }

@@ -10,8 +10,8 @@ void ofApp::setup() {
     oscSender.setup(HOST, PORT);
     mesh.setMode(OF_PRIMITIVE_POINTS);
     
-    camWidth = 320 ;
-    camHeight = 240;
+//    camWidth = 320 ;
+//    camHeight = 240;
     vector<ofVideoDevice> devices = vidGrabber.listDevices();
     for(size_t i = 0; i < devices.size(); i++){
         if(devices[i].bAvailable){
@@ -23,7 +23,7 @@ void ofApp::setup() {
         }
     }
     vidGrabber.setVerbose(true);
-    vidGrabber.setDeviceID(0);
+    vidGrabber.setDeviceID(1);
     vidGrabber.setDesiredFrameRate(30);
     vidGrabber.setup(camWidth, camHeight);
     
@@ -32,14 +32,14 @@ void ofApp::setup() {
     img.setFromPixels(vidGrabber.getPixels());
     
     
-    learn = true;
+    learn = false;
     ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
     //    ofEnableDepthTest();
     ofSetVerticalSync(true);
     ofEnableAlphaBlending();
     liquidness = 1.0;
     speedDampen = 70.0;
-    //    ofBackground(0,0,0);
+        ofBackground(255);
     startTime = ofGetElapsedTimeMillis();
     timerInterval = 125;
     beatTicker = 0.0;
@@ -60,51 +60,15 @@ void ofApp::update() {
     vidGrabber.update();
     
     if (learn) {
-        float threshold = speedDampen;
-        mesh.clear();
-        noteBlobs.clear();
-        if(vidGrabber.isFrameNew()){
-            ofPixels & pixels = vidGrabber.getPixels();
-            pixels.resize(pixels.getWidth() / 2, pixels.getHeight() / 2);
-            
-            int skip = 1;
-            for(int y = 0; y < pixels.getHeight(); y += skip) {
-                for(int x = 0; x < pixels.getWidth(); x += skip) {
-                    ofColor cur = pixels.getColor(x, y);
-                    if(cur.getBrightness() < threshold) {
-                        // 120
-                        glm::vec3 pos(x, -y, 22);
-                        NoteBlob newNoteBlob(pos);
-                        noteBlobs.push_back(newNoteBlob);
-                        x += 4;
-                    }
-                    else {
-                        ofColor tempCol;
-                        tempCol.setHsb(0, 0, 255);
-                        tempCol.a = 1.0;
-                        pixels.setColor(x, y, tempCol);
-                        //                        float z = 0.0;
-                        //                        cur.a == 255;
-                        //                        mesh.addColor(ofColor(10, 10, 10));
-                        //                        glm::vec3 pos(x , -y , z );
-                        //                        mesh.addVertex(pos);
-                    }
-                }
-            }
-            img.setFromPixels(pixels);
-            ofxOscMessage m;
-            m.setAddress("/minmax/y");
-            m.addIntArg(noteBlobs[0].position.y);
-            m.addIntArg(noteBlobs.back().position.y);
-            oscSender.sendMessage(m, false);
-        }
+        takePhoto();
         learn = false;
     }
+    
     float timer = ofGetElapsedTimeMillis() - startTime;
     float count = (int)beatTicker % (int)img.getWidth();
     if (timer >= timerInterval) {
         //        elapsedBeat = true;
-        if (mode == 0) {
+        if (mode == 0) { // rando ando
             if (noteBlobs.size() > 0) {
                 if (ofRandom(100) < 10) {
                     noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
@@ -117,7 +81,7 @@ void ofApp::update() {
                 }
             }
         }
-        if (mode == 1) {
+        if (mode == 1) { // L R seq
             for (int i = 0; i<noteBlobs.size(); i++) {
                 if (noteBlobs[i].position.x  == count) {
                     noteBlobs[i].setBang(true);
@@ -127,10 +91,32 @@ void ofApp::update() {
         beatTicker++;
         startTime = ofGetElapsedTimeMillis();
     }
-    // regular update
-    for (int i = 0; i<noteBlobs.size(); i++) {
-        noteBlobs[i].update(count);
+    
+    //
+    float liquidness = 285;
+    float amplitude = 1.1;
+    float speedDampen = 5;
+    if (noteBlobs.size() > 0 ) {
+        for(unsigned int i = 0; i < noteBlobs.size(); i++){
+    //        noteBlobs[i].position.x += ofSignedNoise(noteBlobs[i].position.x/liquidness, noteBlobs[i].position.y/liquidness,noteBlobs[i].position.z/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+    //        noteBlobs[i].position.y += ofSignedNoise(noteBlobs[i].position.z/liquidness, noteBlobs[i].position.x/liquidness,noteBlobs[i].position.y/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+            noteBlobs[i].position.z += ofSignedNoise(noteBlobs[i].position.y/liquidness, noteBlobs[i].position.z/liquidness,noteBlobs[i].position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+            noteBlobs[i].update(count);
+        }
     }
+
+
+    
+    
+    
+    
+    
+    
+    //
+    // regular update
+//    for (int i = 0; 10; i++) {
+//        
+//    }
 }
 
 //--------------------------------------------------------------
@@ -142,10 +128,53 @@ void ofApp::draw() {
     img.draw(0,-img.getHeight());
     
     //    mesh.draw();
+    vidGrabber.draw(0, 0);
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }
     cam.end();
+}
+
+void ofApp::takePhoto() {
+    float threshold = speedDampen;
+    mesh.clear();
+    noteBlobs.clear();
+    if(vidGrabber.isFrameNew()){
+        ofPixels & pixels = vidGrabber.getPixels();
+        pixels.resize(pixels.getWidth() / 2, pixels.getHeight() / 2);
+        
+        int skip = 1;
+        for(int y = 0; y < pixels.getHeight(); y += skip) {
+            for(int x = 0; x < pixels.getWidth(); x += skip) {
+                ofColor cur = pixels.getColor(x, y);
+                if(cur.getBrightness() < threshold) {
+                    // 120
+                    glm::vec3 pos(x, -y, 5);
+                    NoteBlob newNoteBlob(pos);
+                    noteBlobs.push_back(newNoteBlob);
+                    x += 4;
+                }
+                else {
+                    ofColor tempCol;
+                    tempCol.setHsb(0, 0, 255);
+                    tempCol.a = 1.0;
+                    pixels.setColor(x, y, tempCol);
+                    //                        float z = 0.0;
+                    //                        cur.a == 255;
+                    //                        mesh.addColor(ofColor(10, 10, 10));
+                    //                        glm::vec3 pos(x , -y , z );
+                    //                        mesh.addVertex(pos);
+                }
+            }
+        }
+        img.setFromPixels(pixels);
+        ofxOscMessage m;
+        m.setAddress("/minmax/y");
+        m.addIntArg(noteBlobs[0].position.y);
+        m.addIntArg(noteBlobs.back().position.y);
+        oscSender.sendMessage(m, false);
+    }
+    
 }
 
 //--------------------------------------------------------------

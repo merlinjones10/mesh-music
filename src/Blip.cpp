@@ -11,7 +11,7 @@ Blip::Blip(glm::vec3 pos) {
 void Blip::update(){
     if (size >= 2.0) {
         position.z = 0;
-        color.setHsb(ofRandom(ofRandom(50, 120), ofGetElapsedTimef() + 10), 255, 255);
+        color.setHsb(ofRandom(120, 140), 255, 255);
         fallSpeed = ofRandom(0.5, 5.0);
     }
     if (size > 0.001 ) {

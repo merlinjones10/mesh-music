@@ -9,21 +9,20 @@ void ofApp::setup() {
     //    glPointSize(2);
     oscSender.setup(HOST, PORT);
     mesh.setMode(OF_PRIMITIVE_POINTS);
+
     
-//    camWidth = 320 ;
-//    camHeight = 240;
+    camWidth = 640;
+    camHeight = 480;
     vector<ofVideoDevice> devices = vidGrabber.listDevices();
     for(size_t i = 0; i < devices.size(); i++){
         if(devices[i].bAvailable){
-            //log the device
             ofLogNotice() << devices[i].id << ": " << devices[i].deviceName;
         }else{
-            //log the device and note it as unavailable
             ofLogNotice() << devices[i].id << ": " << devices[i].deviceName << " - unavailable ";
         }
     }
     vidGrabber.setVerbose(true);
-    vidGrabber.setDeviceID(1);
+    vidGrabber.setDeviceID(0);
     vidGrabber.setDesiredFrameRate(30);
     vidGrabber.setup(camWidth, camHeight);
     
@@ -60,6 +59,8 @@ void ofApp::update() {
     vidGrabber.update();
     
     if (learn) {
+        ofLog() << "Learn";
+
         takePhoto();
         learn = false;
     }
@@ -104,31 +105,18 @@ void ofApp::update() {
             noteBlobs[i].update(count);
         }
     }
-
-
-    
-    
-    
-    
-    
-    
-    //
-    // regular update
-//    for (int i = 0; 10; i++) {
-//        
-//    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
     cam.begin();
-    ofTranslate(-img.getWidth() / 2, img.getHeight()/ 2);
+//    ofTranslate(-img.getWidth() / 2, img.getHeight()/ 2);
     
     ofSetColor(255);
-    img.draw(0,-img.getHeight());
+    img.draw(0, -img.getHeight());
     
-    //    mesh.draw();
-    vidGrabber.draw(0, 0);
+//        mesh.draw();
+//    vidGrabber.draw(0, ofGetHeight());
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }
@@ -179,9 +167,10 @@ void ofApp::takePhoto() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    std::cout << key;
     switch (key) {
-            
-        case 'l': {
+        case 49: {
+            ofLog() << "Im learning";
             learn = true;
             break;
         }

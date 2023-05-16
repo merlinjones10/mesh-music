@@ -32,6 +32,7 @@ void NoteBlob::update(float var1){
     float distance = p1.distance(p2);
     if (distance < 0.05) {
         setBang(true);
+        position.z += 1.0;
     };
     
     //    if (1+1 == 3) { // regular burn animation
@@ -62,6 +63,7 @@ void NoteBlob::update(float var1){
 }
 
 void NoteBlob::draw(){
+    color.setHsb(ofRandom(100, 120),255, 255);
     ofSetColor(color);
     blip.draw(position);
     ofSetColor(color);

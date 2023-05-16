@@ -169,7 +169,7 @@ void ofApp::takePhoto() {
 void ofApp::keyPressed(int key){
     std::cout << key;
     switch (key) {
-        case 49: {
+        case 49: { // 1 key 
             ofLog() << "Im learning";
             learn = true;
             break;

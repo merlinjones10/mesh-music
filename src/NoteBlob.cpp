@@ -20,54 +20,32 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
     direction = glm::vec3(0, 0, 0);
     subDiv = s_subDivChoices[4];
     speed = s_tempo * subDiv;
+    hasBanged = false;
     color.setHsb(100, ofRandom(200), ofRandom(255), 200);
     bang = false;
 }
 
-void NoteBlob::update(float var1){
+void NoteBlob::update(float noiseValue){
     
+    position.z += noiseValue;
     
     ofVec3f p1(position);
     ofVec3f p2(position.x, position.y, 0.0);
     float distance = p1.distance(p2);
-    if (distance < 0.05) {
-        setBang(true);
-        position.z += 1.0;
+    if (distance < 0.1) {
+            
+        if (!hasBanged) {
+                    setBang(true);
+            position.y += 400;
+            hasBanged = true;
+        }
     };
-    
-    //    if (1+1 == 3) { // regular burn animation
-    //        ofLog() << "OIoio" ;
-    //        direction = glm::vec3(0, 0, s_tempo);
-    //        if (position.z >= s_baseDistance) {
-    //            blip.size = 2;
-    //            blip.position.z = 1;
-    //            sendMesg();
-    //            position.z = position.z - speed;
-    //            subDiv = s_subDivChoices[(int)ofRandom(s_subDivChoices.size() - 1)];
-    //            speed = s_tempo * subDiv;
-    //
-    //            if (rollDice(99.5)) {
-    //                speed = ofRandom(0.5, 3.0);
-    //            }
-    //            direction = glm::vec3(0, 0, -speed);
-    //            color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
-    //
-    //        } else if (position.z <= 0) {
-    //            position.z = position.z + speed;
-    //            direction = glm::vec3(0, 0, speed);
-    //            color.setHsb(ofRandom(100, 120), ofRandom(100), ofRandom(100), 200);
-    //        }
-    //        position += direction;
-    //    }
     blip.update();
 }
 
 void NoteBlob::draw(){
-    color.setHsb(ofRandom(100, 120),255, 255);
-    ofSetColor(color);
     blip.draw(position);
-    ofSetColor(color);
-//    ofDrawSphere(position, size);
+    ofDrawSphere(position, size);
 }
 
 void NoteBlob::reset(){
@@ -75,8 +53,7 @@ void NoteBlob::reset(){
     direction = glm::vec3(0, 0, 1);
 }
 
-void NoteBlob::setBang(bool value){
-    // rmv param?
+void NoteBlob::setBang(bool value){ // unused param;
     color.setHsb(ofRandom(80, 100), ofRandom(200), ofRandom(255), 200);
     blip.size = 2;
     blip.position.z = 1;

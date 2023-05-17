@@ -33,14 +33,13 @@ void ofApp::setup() {
     
     learn = false;
     ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
-    //    ofEnableDepthTest();
     ofSetVerticalSync(true);
     ofEnableAlphaBlending();
-    liquidness = 1.0;
-    speedDampen = 70.0;
-        ofBackground(255);
+    liquidness = 100.0;
+    speedDampen = 5.0;
+    ofBackground(100);
     startTime = ofGetElapsedTimeMillis();
-    timerInterval = 125;
+    timerInterval = 1000;
     beatTicker = 0.0;
     std::cout << ofGetElapsedTimeMillis() << '\n';
     mode = 0;
@@ -60,49 +59,28 @@ void ofApp::update() {
     
     if (learn) {
         ofLog() << "Learn";
-
         takePhoto();
         learn = false;
+        liquidness = ofRandom(100) + 1;
+        speedDampen = ofRandom(20) + 1;
+        beatTicker = 0;
     }
     
     float timer = ofGetElapsedTimeMillis() - startTime;
     float count = (int)beatTicker % (int)img.getWidth();
     if (timer >= timerInterval) {
-        //        elapsedBeat = true;
-        if (mode == 0) { // rando ando
-            if (noteBlobs.size() > 0) {
-                if (ofRandom(100) < 10) {
-                    noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
-                }
-                if (ofRandom(100) < 2) {
-                    noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
-                }
-                if (ofRandom(100) < 5) {
-                    noteBlobs[ofRandom(noteBlobs.size() - 1)].setBang(true);
-                }
-            }
-        }
-        if (mode == 1) { // L R seq
-            for (int i = 0; i<noteBlobs.size(); i++) {
-                if (noteBlobs[i].position.x  == count) {
-                    noteBlobs[i].setBang(true);
-                }
-            }
-        }
         beatTicker++;
+        ofLog() << "Beat: " << beatTicker;
         startTime = ofGetElapsedTimeMillis();
     }
-    
-    //
-    float liquidness = 285;
-    float amplitude = 1.1;
-    float speedDampen = 5;
+    float amplitude = 0.1;
     if (noteBlobs.size() > 0 ) {
         for(unsigned int i = 0; i < noteBlobs.size(); i++){
-    //        noteBlobs[i].position.x += ofSignedNoise(noteBlobs[i].position.x/liquidness, noteBlobs[i].position.y/liquidness,noteBlobs[i].position.z/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-    //        noteBlobs[i].position.y += ofSignedNoise(noteBlobs[i].position.z/liquidness, noteBlobs[i].position.x/liquidness,noteBlobs[i].position.y/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-            noteBlobs[i].position.z += ofSignedNoise(noteBlobs[i].position.y/liquidness, noteBlobs[i].position.z/liquidness,noteBlobs[i].position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-            noteBlobs[i].update(count);
+            float noiseVal = ofSignedNoise(noteBlobs[i].position.y/liquidness, noteBlobs[i].position.x/liquidness,noteBlobs[i].position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+            if (beatTicker > 20) {
+                noiseVal = -abs(noiseVal); // after 20 secs head home...
+            }
+            noteBlobs[i].update(noiseVal);
         }
     }
 }
@@ -124,7 +102,7 @@ void ofApp::draw() {
 }
 
 void ofApp::takePhoto() {
-    float threshold = speedDampen;
+    float threshold = 70;
     mesh.clear();
     noteBlobs.clear();
     if(vidGrabber.isFrameNew()){
@@ -167,7 +145,6 @@ void ofApp::takePhoto() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-    std::cout << key;
     switch (key) {
         case 49: { // 1 key 
             ofLog() << "Im learning";
@@ -181,23 +158,21 @@ void ofApp::keyPressed(int key){
             break;
             
         case OF_KEY_LEFT:
-            if (mode > 0) {
-                mode -= 1;
-            }
-            std::cout << "mode: " << liquidness << std::endl;
+                liquidness -= 10;
+            std::cout << "lquid: " << liquidness << std::endl;
             break;
         case OF_KEY_RIGHT:
-            mode += 1;
-            std::cout << "mode: " << liquidness << std::endl;
+            liquidness += 10;
+            std::cout << "lquid: " << liquidness << std::endl;
             break;
         case OF_KEY_DOWN:
-            if (speedDampen> 0) {
-                speedDampen -= 1.0;
-            }
+    
+                speedDampen -= 5.0;
+            
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
         case OF_KEY_UP:
-            speedDampen += 1.0;
+            speedDampen += 5.0;
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
             

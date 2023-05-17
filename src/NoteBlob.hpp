@@ -18,7 +18,8 @@ public:
     
     int size;
     int subDiv;
-    float speed; 
+    float speed;
+    bool hasBanged; 
 
     void update(float);
     void draw();

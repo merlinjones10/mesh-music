@@ -115,7 +115,11 @@ void ofApp::takePhoto() {
                 ofColor cur = pixels.getColor(x, y);
                 if(cur.getBrightness() < threshold) {
                     // 120
-                    glm::vec3 pos(x, -y, 5);
+
+                    int randomStart = ofRandom(5, 15);
+                    glm::vec3 pos(x, -y, randomStart); // testing out ways to stop the mass notes at the start of a picture, this range could be extended OR shortened for effect? so every picture behaves differently
+                    // the noise values are also slightly different so there seems to be enough variation....
+                    // last thing might be to receive midi to take the photo on command from pad rather than keyboard.
                     NoteBlob newNoteBlob(pos);
                     noteBlobs.push_back(newNoteBlob);
                     x += 4;

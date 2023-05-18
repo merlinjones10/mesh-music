@@ -37,7 +37,8 @@ void ofApp::setup() {
     ofEnableAlphaBlending();
     liquidness = 100.0;
     speedDampen = 5.0;
-    ofBackground(100);
+    ofBackground(10);
+
     startTime = ofGetElapsedTimeMillis();
     timerInterval = 1000;
     beatTicker = 0.0;
@@ -126,7 +127,7 @@ void ofApp::takePhoto() {
                 }
                 else {
                     ofColor tempCol;
-                    tempCol.setHsb(0, 0, 255);
+                    tempCol.setHsb(0, 0, 0);
                     tempCol.a = 1.0;
                     pixels.setColor(x, y, tempCol);
                     //                        float z = 0.0;

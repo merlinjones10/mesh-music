@@ -17,8 +17,8 @@ void Blip::update(){
     if (size > 0.001 ) {
         size -=0.05;
         position.z += fallSpeed;
-        color.setBrightness(color.getBrightness() - 10.0);
-        color.setHsb(color.getHue(),color.getSaturation(), color.getBrightness());
+//        color.setBrightness(color.getBrightness() - 10.0);
+//        color.setHsb(color.getHue(),color.getSaturation(), color.getBrightness());
     }
 }
 
@@ -27,6 +27,5 @@ void Blip::draw(glm::vec3 parentPosition){
     if (size > 0.001) {
         ofDrawSphere(position, size);
         ofDrawCircle(position.x, position.y, 1, size / 1.5);
-
     }
 }

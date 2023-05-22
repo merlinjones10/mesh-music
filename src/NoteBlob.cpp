@@ -32,22 +32,24 @@ void NoteBlob::update(float noiseValue){
     ofVec3f p1(position);
     ofVec3f p2(position.x, position.y, 0.0);
     float distance = p1.distance(p2);
-    if (distance < 0.1) {
-        if (!hasBanged) {
+    if (distance < 0.1 && !hasBanged) {
             setBang(true);
-            position.y += 400;
+            position.y += 600;
             hasBanged = true;
-        }
     };
     if (hasBanged) {
-        position.x =  position.x += ofSignedNoise(position.y, ofGetElapsedTimeMillis()) * 0.01;
-        position.y = position.y += ofSignedNoise(position.x, ofGetElapsedTimeMillis()) * 0.02;
+        float liquidness = 100.0;
+        float speedDampen = 5.0;
+        float amplitude = 1.0;
+//        position.x += ofSignedNoise(position.y/liquidness, position.x/liquidness, position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+//        position.y += ofSignedNoise(position.y/liquidness, position.x/liquidness, position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
     }
     blip.update();
 }
 
 void NoteBlob::draw(){
-//    blip.draw(position);
+    blip.draw(position);
+    ofSetColor(100);
     ofDrawSphere(position, size);
 }
 
@@ -58,8 +60,8 @@ void NoteBlob::reset(){
 
 void NoteBlob::setBang(bool value){ // unused param;
 //    color.setHsb(ofRandom(80, 100), ofRandom(200), ofRandom(255), 200);
-    blip.size = ofRandom(2, 4);
-    blip.position.z = 1;
+    blip.size = ofRandom(1.9, 4);
+//    blip.position.z = 1;
     sendMesg();
 }
 

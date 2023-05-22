@@ -6,10 +6,8 @@
 void ofApp::setup() {
     ofSetFrameRate(30);
     ofSetSphereResolution(6);
-    //    glPointSize(2);
     oscSender.setup(HOST, PORT);
     mesh.setMode(OF_PRIMITIVE_POINTS);
-
     
     camWidth = 640;
     camHeight = 480;
@@ -38,11 +36,9 @@ void ofApp::setup() {
     liquidness = 100.0;
     speedDampen = 5.0;
     ofBackground(10);
-
     startTime = ofGetElapsedTimeMillis();
     timerInterval = 1000;
     beatTicker = 0.0;
-    std::cout << ofGetElapsedTimeMillis() << '\n';
     mode = 0;
 }
 
@@ -62,8 +58,9 @@ void ofApp::update() {
         ofLog() << "Learn";
         takePhoto();
         learn = false;
-        liquidness = ofRandom(100) + 1;
-        speedDampen = ofRandom(20) + 1;
+        liquidness = ofRandom(800) + 1;
+//        speedDampen = ofRandom(200) + 1;
+        ofLog() << "Lquid: " << liquidness << " | " << "Speed D: " <<  speedDampen;
         beatTicker = 0;
     }
     
@@ -71,16 +68,16 @@ void ofApp::update() {
     float count = (int)beatTicker % (int)img.getWidth();
     if (timer >= timerInterval) {
         beatTicker++;
-        ofLog() << "Beat: " << beatTicker;
+//        ofLog() << "Beat: " << beatTicker;
         startTime = ofGetElapsedTimeMillis();
     }
     float amplitude = 0.1;
     if (noteBlobs.size() > 0 ) {
         for(unsigned int i = 0; i < noteBlobs.size(); i++){
             float noiseVal = ofSignedNoise(noteBlobs[i].position.y/liquidness, noteBlobs[i].position.x/liquidness,noteBlobs[i].position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-            if (beatTicker > 20) {
-                noiseVal = -abs(noiseVal); // after 20 secs head home...
-            }
+//            if (beatTicker > 60) {
+//                noiseVal = -abs(noiseVal); // after 20 secs head home...
+//            }
             noteBlobs[i].update(noiseVal);
         }
     }
@@ -89,13 +86,12 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
     cam.begin();
-//    ofTranslate(-img.getWidth() / 2, img.getHeight()/ 2);
     
     ofSetColor(255);
-    img.draw(0, -img.getHeight());
     
-//        mesh.draw();
-//    vidGrabber.draw(0, ofGetHeight());
+//    img.draw(0, -img.getHeight());
+   
+    vidGrabber.draw(-700, -img.getHeight() + 400);
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }
@@ -103,22 +99,22 @@ void ofApp::draw() {
 }
 
 void ofApp::takePhoto() {
-    float threshold = 70;
+    float threshold = 90;
     mesh.clear();
     noteBlobs.clear();
     if(vidGrabber.isFrameNew()){
         ofPixels & pixels = vidGrabber.getPixels();
-        pixels.resize(pixels.getWidth() / 2, pixels.getHeight() / 2);
+        pixels.resize(pixels.getWidth() , pixels.getHeight());
         
-        int skip = 1;
+        int skip = 4;
         for(int y = 0; y < pixels.getHeight(); y += skip) {
             for(int x = 0; x < pixels.getWidth(); x += skip) {
                 ofColor cur = pixels.getColor(x, y);
                 if(cur.getBrightness() < threshold) {
                     // 120
 
-                    int randomStart = ofRandom(5, 15);
-                    glm::vec3 pos(x, -y, randomStart); // testing out ways to stop the mass notes at the start of a picture, this range could be extended OR shortened for effect? so every picture behaves differently
+//                    int randomStart = ofRandom(5, 15);
+                    glm::vec3 pos(x, -y, 20); // testing out ways to stop the mass notes at the start of a picture, this range could be extended OR shortened for effect? so every picture behaves differently
                     // the noise values are also slightly different so there seems to be enough variation....
                     // last thing might be to receive midi to take the photo on command from pad rather than keyboard.
                     NoteBlob newNoteBlob(pos);
@@ -171,9 +167,7 @@ void ofApp::keyPressed(int key){
             std::cout << "lquid: " << liquidness << std::endl;
             break;
         case OF_KEY_DOWN:
-    
                 speedDampen -= 5.0;
-            
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
         case OF_KEY_UP:

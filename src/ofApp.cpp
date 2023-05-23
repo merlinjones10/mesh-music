@@ -35,7 +35,7 @@ void ofApp::setup() {
     ofEnableAlphaBlending();
     liquidness = 100.0;
     speedDampen = 5.0;
-    ofBackground(10);
+    ofBackground(101);
     startTime = ofGetElapsedTimeMillis();
     timerInterval = 1000;
     beatTicker = 0.0;
@@ -53,31 +53,27 @@ void ofApp::onBangInAnyBlob(glm::vec3 & e){
 
 void ofApp::update() {
     vidGrabber.update();
-    
     if (learn) {
         ofLog() << "Learn";
         takePhoto();
         learn = false;
         liquidness = ofRandom(800) + 1;
-//        speedDampen = ofRandom(200) + 1;
         ofLog() << "Lquid: " << liquidness << " | " << "Speed D: " <<  speedDampen;
         beatTicker = 0;
     }
-    
     float timer = ofGetElapsedTimeMillis() - startTime;
     float count = (int)beatTicker % (int)img.getWidth();
     if (timer >= timerInterval) {
         beatTicker++;
-//        ofLog() << "Beat: " << beatTicker;
         startTime = ofGetElapsedTimeMillis();
     }
     float amplitude = 0.1;
     if (noteBlobs.size() > 0 ) {
         for(unsigned int i = 0; i < noteBlobs.size(); i++){
             float noiseVal = ofSignedNoise(noteBlobs[i].position.y/liquidness, noteBlobs[i].position.x/liquidness,noteBlobs[i].position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-//            if (beatTicker > 60) {
-//                noiseVal = -abs(noiseVal); // after 20 secs head home...
-//            }
+            if (beatTicker > 100) {
+                noiseVal = -abs(noiseVal); // after 20 secs head home...
+            }
             noteBlobs[i].update(noiseVal);
         }
     }
@@ -90,6 +86,7 @@ void ofApp::draw() {
     ofSetColor(255);
     
 //    img.draw(0, -img.getHeight());
+    mesh.draw(); // change to image ?? doesnt need to be a mesh ...
    
     vidGrabber.draw(-700, -img.getHeight() + 400);
     for (int i = 0; i<noteBlobs.size(); i++) {
@@ -102,35 +99,29 @@ void ofApp::takePhoto() {
     float threshold = 90;
     mesh.clear();
     noteBlobs.clear();
-    if(vidGrabber.isFrameNew()){
         ofPixels & pixels = vidGrabber.getPixels();
         pixels.resize(pixels.getWidth() , pixels.getHeight());
         
-        int skip = 4;
+        int skip = 3;
         for(int y = 0; y < pixels.getHeight(); y += skip) {
             for(int x = 0; x < pixels.getWidth(); x += skip) {
                 ofColor cur = pixels.getColor(x, y);
                 if(cur.getBrightness() < threshold) {
-                    // 120
-
-//                    int randomStart = ofRandom(5, 15);
-                    glm::vec3 pos(x, -y, 20); // testing out ways to stop the mass notes at the start of a picture, this range could be extended OR shortened for effect? so every picture behaves differently
-                    // the noise values are also slightly different so there seems to be enough variation....
-                    // last thing might be to receive midi to take the photo on command from pad rather than keyboard.
+                    glm::vec3 pos(x, -y, 10);
                     NoteBlob newNoteBlob(pos);
                     noteBlobs.push_back(newNoteBlob);
-                    x += 4;
+                    x += skip;
                 }
                 else {
                     ofColor tempCol;
                     tempCol.setHsb(0, 0, 0);
                     tempCol.a = 1.0;
                     pixels.setColor(x, y, tempCol);
-                    //                        float z = 0.0;
-                    //                        cur.a == 255;
-                    //                        mesh.addColor(ofColor(10, 10, 10));
-                    //                        glm::vec3 pos(x , -y , z );
-                    //                        mesh.addVertex(pos);
+                    float z = 0.0;
+                    cur.a == 255;
+                    mesh.addColor(ofColor(10, 10, 10));
+                    glm::vec3 pos(x , -y , z );
+                    mesh.addVertex(pos);
                 }
             }
         }
@@ -140,8 +131,6 @@ void ofApp::takePhoto() {
         m.addIntArg(noteBlobs[0].position.y);
         m.addIntArg(noteBlobs.back().position.y);
         oscSender.sendMessage(m, false);
-    }
-    
 }
 
 //--------------------------------------------------------------

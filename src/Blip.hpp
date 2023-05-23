@@ -8,7 +8,8 @@ public:
     glm::vec3 position;
     float size;
     ofColor color;
-    ofVec3f particleDirection; 
+    ofVec3f particleDirection;
+    bool active; 
     void setup();
     void update();
     void draw(glm::vec3);

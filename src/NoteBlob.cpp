@@ -26,9 +26,7 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
 }
 
 void NoteBlob::update(float noiseValue){
-    
     position.z += noiseValue;
-    
     ofVec3f p1(position);
     ofVec3f p2(position.x, position.y, 0.0);
     float distance = p1.distance(p2);
@@ -49,7 +47,14 @@ void NoteBlob::update(float noiseValue){
 
 void NoteBlob::draw(){
     blip.draw(position);
-    ofSetColor(100);
+    float sparkleProbability = ofNoise(position.y, position.x, ofGetElapsedTimef());
+    if (sparkleProbability > 0.92) {
+        ofLog() << sparkleProbability; // add a lil sparkle
+        ofSetColor(130);
+    } else {
+        ofSetColor(100);
+    }
+//    ofSetColor(100);
     ofDrawSphere(position, size);
 }
 
@@ -61,6 +66,7 @@ void NoteBlob::reset(){
 void NoteBlob::setBang(bool value){ // unused param;
 //    color.setHsb(ofRandom(80, 100), ofRandom(200), ofRandom(255), 200);
     blip.size = ofRandom(1.9, 4);
+    blip.active = true;
 //    blip.position.z = 1;
     sendMesg();
 }

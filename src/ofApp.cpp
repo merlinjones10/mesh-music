@@ -35,7 +35,7 @@ void ofApp::setup() {
     ofEnableAlphaBlending();
     liquidness = 100.0;
     speedDampen = 5.0;
-    ofBackground(101);
+    ofBackground(10);
     startTime = ofGetElapsedTimeMillis();
     timerInterval = 1000;
     beatTicker = 0.0;
@@ -54,10 +54,11 @@ void ofApp::onBangInAnyBlob(glm::vec3 & e){
 void ofApp::update() {
     vidGrabber.update();
     if (learn) {
-        ofLog() << "Learn";
         takePhoto();
         learn = false;
-        liquidness = ofRandom(800) + 1;
+//        liquidness = ofRandom(800) + 1;
+        int liquidChoices[3] = {800, 100, 400};
+        liquidness = liquidChoices[mode];
         ofLog() << "Lquid: " << liquidness << " | " << "Speed D: " <<  speedDampen;
         beatTicker = 0;
     }
@@ -67,12 +68,15 @@ void ofApp::update() {
         beatTicker++;
         startTime = ofGetElapsedTimeMillis();
     }
-    float amplitude = 0.1;
+    float amplitude = 0.0;
+    if (ofRandom(1000) > 800) {
+        amplitude = 0.5;
+    }
     if (noteBlobs.size() > 0 ) {
         for(unsigned int i = 0; i < noteBlobs.size(); i++){
             float noiseVal = ofSignedNoise(noteBlobs[i].position.y/liquidness, noteBlobs[i].position.x/liquidness,noteBlobs[i].position.x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-            if (beatTicker > 100) {
-                noiseVal = -abs(noiseVal); // after 20 secs head home...
+            if (beatTicker > 50) {
+                noiseVal = -abs(noiseVal);
             }
             noteBlobs[i].update(noiseVal);
         }
@@ -84,11 +88,8 @@ void ofApp::draw() {
     cam.begin();
     
     ofSetColor(255);
-    
-//    img.draw(0, -img.getHeight());
-    mesh.draw(); // change to image ?? doesnt need to be a mesh ...
-   
-    vidGrabber.draw(-700, -img.getHeight() + 400);
+    vidGrabber.draw(-ofGetWidth() / 2 , (ofGetHeight() / 2) - vidGrabber.getHeight() / 4, vidGrabber.getWidth() / 4, vidGrabber.getHeight() /4 );
+    ofTranslate(-310,230, 180);
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }
@@ -101,8 +102,8 @@ void ofApp::takePhoto() {
     noteBlobs.clear();
         ofPixels & pixels = vidGrabber.getPixels();
         pixels.resize(pixels.getWidth() , pixels.getHeight());
-        
-        int skip = 3;
+    int skipPresets[3] = {4, 2, 8};
+    int skip = skipPresets[mode];
         for(int y = 0; y < pixels.getHeight(); y += skip) {
             for(int x = 0; x < pixels.getWidth(); x += skip) {
                 ofColor cur = pixels.getColor(x, y);
@@ -135,9 +136,20 @@ void ofApp::takePhoto() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    ofLog() << key;
     switch (key) {
-        case 49: { // 1 key 
-            ofLog() << "Im learning";
+        case 49: { // 1 key
+            mode = 0;
+            learn = true;
+            break;
+        }
+        case 50: { // 1 key
+            mode = 1;
+            learn = true;
+            break;
+        }
+        case 51: { // 1 key
+            mode = 2;
             learn = true;
             break;
         }
@@ -163,7 +175,7 @@ void ofApp::keyPressed(int key){
             speedDampen += 5.0;
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
-            
+
         default:
             break;
     }

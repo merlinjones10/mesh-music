@@ -21,7 +21,7 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
     subDiv = s_subDivChoices[4];
     speed = s_tempo * subDiv;
     hasBanged = false;
-    color.setHsb(100, ofRandom(200), ofRandom(255), 200);
+    color.setHsb(150, ofRandom(250), ofRandom(255), 200);
     bang = false;
 }
 
@@ -47,13 +47,18 @@ void NoteBlob::update(float noiseValue){
 
 void NoteBlob::draw(){
     blip.draw(position);
-    float sparkleProbability = ofNoise(position.y, position.x, ofGetElapsedTimef());
-    if (sparkleProbability > 0.92) {
-        ofLog() << sparkleProbability; // add a lil sparkle
-        ofSetColor(130);
-    } else {
-        ofSetColor(100);
+    if (hasBanged) {
+        ofSetColor(20);
     }
+    else {
+        float sparkleProbability = ofNoise(position.y, position.x, ofGetElapsedTimef());
+        if (sparkleProbability > 0.92) {
+            ofSetColor(130);
+        } else {
+            ofSetColor(100);
+        }
+    }
+
 //    ofSetColor(100);
     ofDrawSphere(position, size);
 }

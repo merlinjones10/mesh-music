@@ -17,9 +17,9 @@ void Blip::update(glm::vec3 parentPos){
     if (size > 0.001 ) {
         size -=0.05;
         position.z -= fallSpeed;
-        color.setBrightness(color.getBrightness() - 10.0);
+        color.setBrightness(color.getBrightness() - 2.5);
         float amount3d = ofSignedNoise(position.x / 10, position.y / 10, ofGetElapsedTimef() + 1) * 0.5;
-        float amount3d_ = ofSignedNoise(position.y / 10, position.x / 10, ofGetElapsedTimef() + 1) * 0.5;
+        float amount3d_ = -ofNoise(position.y / 10, position.x / 10, ofGetElapsedTimef() + 1) * 0.5;
 
         position.x += amount3d;
         position.y += amount3d_;
@@ -33,5 +33,5 @@ void Blip::draw(glm::vec3 parentPosition){
         ofDrawCircle(position.x, position.y, position.z, size );
     }
 }
-// work on falling star effect
-// work on brighness > fade and nice colors
+
+

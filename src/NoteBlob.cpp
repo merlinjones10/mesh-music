@@ -27,28 +27,24 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
 
 void NoteBlob::update(float var1){
     if (position.z > 10 ) {
-        blip.size = 2.0;
+        blip.size = 5.0;
         sendMesg();
         position.z = 0;
     };
-    if (position.x < 10) {
-        color.setHsb(150, 255, ofRandom(255));
-//        ofDrawSphere(position, size);
-
-
-    }
     float amount3d = ofSignedNoise(position.x / 1000, position.y / 100, ofGetElapsedTimef() + 100 / 5) * 0.1;
-    float amount2d = ofSignedNoise(position.y, ofGetElapsedTimef() + 100) * 0.1;
+    float amount2d = ofSignedNoise(position.y, ofGetElapsedTimef() + 0) * 0.1;
+    float amount1d = ofSignedNoise(ofGetElapsedTimeMillis()) * 0.1;
+
     direction = glm::vec3(0, 0, amount3d);
     position += direction;
-    blip.update();
+    blip.update(position);
 }
 
 void NoteBlob::draw(){
     ofSetColor(color);
     blip.draw(position);
     ofSetColor(color);
-    ofDrawSphere(position, size);
+//    ofDrawSphere(position, size);
 }
 
 void NoteBlob::reset(){

@@ -18,7 +18,7 @@ void ofApp::setup() {
         for(int x = 0; x < img.getWidth() -1; x += skip) {
             ofColor cur = img.getColor(x, y);
             if(cur.getBrightness() < 10) {
-                glm::vec3 pos(x * SCALE, y * SCALE, 0);
+                glm::vec3 pos(x * SCALE, y * SCALE, 3);
                 NoteBlob newNoteBlob(pos);
                 noteBlobs.push_back(newNoteBlob);
             }
@@ -39,18 +39,43 @@ void ofApp::setup() {
     speedDampen = 0.01;
     ofBackground(0,0,0);
     ofxOscMessage m;
-    m.setAddress("/minmax/y");
-    m.addIntArg(noteBlobs[0].position.y);
-    m.addIntArg(noteBlobs.back().position.y);
-    oscSender.sendMessage(m, false);
-    ofxOscMessage m2;
-    m2.setAddress("/minmax/x");
-    m2.addIntArg(noteBlobs[0].position.x);
-    m2.addIntArg(noteBlobs.back().position.x);
-    oscSender.sendMessage(m2, false);
+
+    
+    int highestX = noteBlobs[0].position.x;
+    int lowestX = noteBlobs[0].position.x;
+    int highestY = noteBlobs[0].position.y;
+    int lowestY = noteBlobs[0].position.y;
+    
+    
     for (NoteBlob noteBlob : noteBlobs) {
-        ofLog() << noteBlob.position.x;
+        if (noteBlob.position.x > highestX) {
+            highestX = noteBlob.position.x;
+        }
+        if (noteBlob.position.y > highestY) {
+            highestY = noteBlob.position.y;
+        }
+        if (noteBlob.position.x < lowestX) {
+             lowestX = noteBlob.position.x;
+        }
+        if (noteBlob.position.y < lowestY) {
+             lowestY = noteBlob.position.y;
+        }
     }
+    m.setAddress("/minmax/x");
+    m.addIntArg(lowestX);
+    m.addIntArg(highestX);
+    oscSender.sendMessage(m, false);
+    
+    ofxOscMessage m2;
+    m2.setAddress("/minmax/y");
+    m2.addIntArg(lowestY);
+    m2.addIntArg(highestY);
+    ofLog() << lowestX << " || " << highestX;
+    ofLog() << lowestY << " || " << highestY;
+
+    oscSender.sendMessage(m2, false);
+
+
 }
 
 //--------------------------------------------------------------

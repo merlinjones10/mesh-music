@@ -10,7 +10,7 @@ public:
     ofColor color;
     float fallSpeed; 
     void setup();
-    void update();
+    void update(glm::vec3);
     void draw(glm::vec3);
     void reset();
     

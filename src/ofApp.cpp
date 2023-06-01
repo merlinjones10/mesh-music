@@ -12,15 +12,13 @@ void ofApp::setup() {
     img.resize(img.getWidth() / 1, img.getHeight() / 1);
     oscSender.setup(HOST, PORT);
     mesh.setMode(OF_PRIMITIVE_POINTS);
-    
-    // when the thing is created, add it to the mesh at a skipped rate, * 2
-    // so every 2 pixels
-    int skip = 1;
+
+    int skip = 2;
     for(int y = 0; y < img.getHeight(); y += skip) {
         for(int x = 0; x < img.getWidth() -1; x += skip) {
             ofColor cur = img.getColor(x, y);
             if(cur.getBrightness() < 10) {
-                glm::vec3 pos(x * SCALE, y * SCALE, 22);
+                glm::vec3 pos(x * SCALE, y * SCALE, 0);
                 NoteBlob newNoteBlob(pos);
                 noteBlobs.push_back(newNoteBlob);
             }
@@ -40,7 +38,19 @@ void ofApp::setup() {
     liquidness = 1.0;
     speedDampen = 0.01;
     ofBackground(0,0,0);
-
+    ofxOscMessage m;
+    m.setAddress("/minmax/y");
+    m.addIntArg(noteBlobs[0].position.y);
+    m.addIntArg(noteBlobs.back().position.y);
+    oscSender.sendMessage(m, false);
+    ofxOscMessage m2;
+    m2.setAddress("/minmax/x");
+    m2.addIntArg(noteBlobs[0].position.x);
+    m2.addIntArg(noteBlobs.back().position.x);
+    oscSender.sendMessage(m2, false);
+    for (NoteBlob noteBlob : noteBlobs) {
+        ofLog() << noteBlob.position.x;
+    }
 }
 
 //--------------------------------------------------------------

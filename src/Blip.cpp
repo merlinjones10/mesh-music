@@ -17,11 +17,11 @@ void Blip::update(){
     }
     if (size > 0.001 ) {
         size -=0.05;
-        position.z -= fallSpeed;
-        color.setBrightness(color.getBrightness() - 10.0);
-        color.setSaturation(color.getSaturation() + 10.0);
+//        position.z -= fallSpeed;
+//        color.setBrightness(color.getBrightness() - 10.0);
+//        color.setSaturation(color.getSaturation() + 10.0);
 //        color.(color, count);
-        color.setHsb(color.getHue(),color.getSaturation(), color.getBrightness());
+//        color.setHsb(color.getHue(),color.getSaturation(), color.getBrightness());
     }
 }
 
@@ -29,7 +29,7 @@ void Blip::draw(glm::vec3 parentPosition){
     ofSetColor(color);
     if (size > 0.001) {
         ofDrawSphere(position, size);
-        ofDrawCircle(position.x, position.y, 1, size / 1.5);
+        ofDrawCircle(position.x, position.y, position.z, size / 1.5);
 
     }
 }

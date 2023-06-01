@@ -17,12 +17,15 @@ public:
     
     int size;
     int subDiv;
-    float speed; 
+    float speed;
+    bool active; 
+    bool hasBanged; 
 
     void update(float);
     void draw();
     void reset();
     void sendMesg();
+    
     
     static ofEvent<glm::vec3> onBlobBangGlobal;
     static vector<int> s_subDivChoices;

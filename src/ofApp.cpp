@@ -6,48 +6,87 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
     ofSetFrameRate(30);
-//    ofSetSphereResolution(10);
-//    glPointSize(2);
-    ofSetVerticalSync(true);
-    img.load("bach.png");
-    img.resize(img.getWidth() / 1, img.getHeight() / 1);
+    ofSetSphereResolution(3);
     oscSender.setup(HOST, PORT);
     mesh.setMode(OF_PRIMITIVE_POINTS);
-
-    int skip = 2;
-    for(int y = 0; y < img.getHeight(); y += skip) {
-        for(int x = 0; x < img.getWidth() -1; x += skip) {
-            ofColor cur = img.getColor(x, y);
-            if(cur.getBrightness() < 10) {
-                glm::vec3 pos(x * SCALE, y * SCALE, 3);
-                NoteBlob newNoteBlob(pos);
-                noteBlobs.push_back(newNoteBlob);
-            }
-            else {
-                float z = 1.0;
-                cur.a == 255;
-                mesh.addColor(ofColor(10, 10, 10));
-                glm::vec3 pos(x * SCALE, y * SCALE, z * SCALE);
-                mesh.addVertex(pos);
-            }
+    camWidth = 640;
+    camHeight = 480;
+    vector<ofVideoDevice> devices = vidGrabber.listDevices();
+    for(size_t i = 0; i < devices.size(); i++){
+        if(devices[i].bAvailable){
+            ofLogNotice() << devices[i].id << ": " << devices[i].deviceName;
+        }else{
+            ofLogNotice() << devices[i].id << ": " << devices[i].deviceName << " - unavailable ";
         }
     }
-
+    vidGrabber.setDeviceID(0);
+    vidGrabber.setDesiredFrameRate(30);
+    vidGrabber.setup(camWidth, camHeight);
+    img.setFromPixels(vidGrabber.getPixels());
+    learn = false;
     ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
     ofEnableDepthTest();
     ofEnableAlphaBlending();
-    liquidness = 1.0;
-    speedDampen = 0.01;
+    liquidness = -320.0;
+    speedDampen = -260.0;
     ofBackground(0,0,0);
     ofxOscMessage m;
+    seed = ofRandom(1, 1000);
+    ofLog() << seed;
 
+}
+//--------------------------------------------------------------
+
+void ofApp::takePhoto() {
+    float threshold = 90;
+    mesh.clear();
+    noteBlobs.clear();
+    ofPixels & pixels = vidGrabber.getPixels();
+    pixels.resize(pixels.getWidth() , pixels.getHeight());
+    ofPixels & hiDefPixels = vidGrabber.getPixels();
+    hiDefPixels.resize(hiDefPixels.getWidth() , hiDefPixels.getHeight());
+    int skip = 2;
+    ofColor tempCol;
+        for(int y = 0; y < pixels.getHeight(); y += skip) {
+            for(int x = 0; x < pixels.getWidth(); x += skip) {
+                ofColor cur = pixels.getColor(x, y);
+                if(cur.getBrightness() < threshold) {
+                    glm::vec3 pos(x, -y, 10);
+                    NoteBlob newNoteBlob(pos);
+                    noteBlobs.push_back(newNoteBlob);
+                }
+            }
+        }
+    for(int y = 0; y < hiDefPixels.getHeight(); y++) {
+        for(int x = 0; x < hiDefPixels.getWidth(); x ++) {
+            ofColor cur = pixels.getColor(x, y);
+            if(cur.getBrightness() < threshold) {
+                tempCol.setHsb(200, 100, 20, 200);
+                tempCol.a = 1.0;
+                hiDefPixels.setColor(x, y, tempCol);
+            }
+            else {
+                tempCol.setHsb(0, 0, 0, 200);
+                tempCol.a = 1.0;
+                hiDefPixels.setColor(x, y, tempCol);
+            }
+        }
+    }
+        img.setFromPixels(hiDefPixels);
+        ofxOscMessage m;
+        m.setAddress("/minmax/y");
+        m.addIntArg(noteBlobs[0].position.y);
+        m.addIntArg(noteBlobs.back().position.y);
+        oscSender.sendMessage(m, false);
+    
+    
     
     int highestX = noteBlobs[0].position.x;
     int lowestX = noteBlobs[0].position.x;
     int highestY = noteBlobs[0].position.y;
     int lowestY = noteBlobs[0].position.y;
-    
-    
+
+
     for (NoteBlob noteBlob : noteBlobs) {
         if (noteBlob.position.x > highestX) {
             highestX = noteBlob.position.x;
@@ -66,7 +105,7 @@ void ofApp::setup() {
     m.addIntArg(lowestX);
     m.addIntArg(highestX);
     oscSender.sendMessage(m, false);
-    
+
     ofxOscMessage m2;
     m2.setAddress("/minmax/y");
     m2.addIntArg(lowestY);
@@ -75,9 +114,6 @@ void ofApp::setup() {
     ofLog() << lowestY << " || " << highestY;
 
     oscSender.sendMessage(m2, false);
-    seed = ofRandom(1, 1000);
-    ofLog() << seed;  
-
 }
 
 //--------------------------------------------------------------
@@ -90,6 +126,11 @@ void ofApp::onBangInAnyBlob(glm::vec3 & e){
 }
 
 void ofApp::update() {
+    vidGrabber.update();
+    if (learn) {
+        takePhoto();
+        learn = false;
+    }
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].update(seed);
     }
@@ -98,12 +139,16 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
     cam.begin();
-    ofScale(2, -2, 2);
-    ofTranslate(-img.getWidth() * SCALE / 2, -img.getHeight() * SCALE / 2 );
-    mesh.draw();
+    
+    ofSetColor(255);
+    vidGrabber.draw(-ofGetWidth() / 2 , (ofGetHeight() / 2) - vidGrabber.getHeight() / 4, vidGrabber.getWidth() / 4, vidGrabber.getHeight() /4 );
+    img.draw(liquidness, speedDampen);
+
+    ofTranslate(-310,230, 180);
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }
+//    mesh.draw();
     cam.end();
 }
 
@@ -117,24 +162,27 @@ void ofApp::keyPressed(int key){
             break;
             
         case OF_KEY_LEFT:
-            if (liquidness > 0) {
-                liquidness -= 0.5;
-            }
+          
+                liquidness -= 2;
+            
             std::cout << "Lquid: " << liquidness << std::endl;
             break;
         case OF_KEY_RIGHT:
-            liquidness += 0.5;
+            liquidness += 2;
             std::cout << "Lquid: " << liquidness << std::endl;
             break;
         case OF_KEY_DOWN:
-            if (speedDampen> 0) {
-                speedDampen -= 0.001;
-            }
+         
+                speedDampen -= 2;
+            
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
         case OF_KEY_UP:
-            speedDampen += 0.001;
+            speedDampen += 2;
             std::cout << "Speed: " << speedDampen << std::endl;
+            break;
+        case 49:
+            learn = true;
             break;
             
         default:

@@ -2,6 +2,7 @@
 #define HOST "localhost"
 #define PORT 12346
 #define SCALE 3
+
 //--------------------------------------------------------------
 void ofApp::setup() {
     ofSetFrameRate(30);
@@ -74,7 +75,8 @@ void ofApp::setup() {
     ofLog() << lowestY << " || " << highestY;
 
     oscSender.sendMessage(m2, false);
-
+    seed = ofRandom(1, 1000);
+    ofLog() << seed;  
 
 }
 
@@ -89,7 +91,7 @@ void ofApp::onBangInAnyBlob(glm::vec3 & e){
 
 void ofApp::update() {
     for (int i = 0; i<noteBlobs.size(); i++) {
-        noteBlobs[i].update(speedDampen);
+        noteBlobs[i].update(seed);
     }
 }
 

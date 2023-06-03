@@ -25,13 +25,13 @@ NoteBlob::NoteBlob(glm::vec3 pos) : blip(pos) {
     active = false;
 }
 
-void NoteBlob::update(float var1){
+void NoteBlob::update(float seed){
     if (position.z > 10 ) {
         blip.size = 5.0;
         sendMesg();
         position.z = 0;
     };
-    float amount3d = ofSignedNoise(position.x / 1000, position.y / 1000, ofGetElapsedTimef() + 1 / 5) * 5.1;
+    float amount3d = ofSignedNoise(position.x / 1000, position.y / 1000, ofGetElapsedTimef() + seed ) * 5.1;
     float amount2d = ofSignedNoise(position.y, ofGetElapsedTimef() + 0) * 0.1;
     float amount1d = ofSignedNoise(ofGetElapsedTimeMillis()) * 0.1;
 

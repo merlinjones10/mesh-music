@@ -8,7 +8,6 @@ void ofApp::setup() {
     ofSetFrameRate(30);
     ofSetSphereResolution(3);
     oscSender.setup(HOST, PORT);
-    mesh.setMode(OF_PRIMITIVE_POINTS);
     camWidth = 640;
     camHeight = 480;
     vector<ofVideoDevice> devices = vidGrabber.listDevices();
@@ -25,21 +24,20 @@ void ofApp::setup() {
     img.setFromPixels(vidGrabber.getPixels());
     learn = false;
     ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
-    ofEnableDepthTest();
-    ofEnableAlphaBlending();
+//    ofEnableDepthTest();
+//    ofEnableAlphaBlending();
     liquidness = -320.0;
     speedDampen = -260.0;
     ofBackground(0,0,0);
     ofxOscMessage m;
-    seed = ofRandom(1, 1000);
-    ofLog() << seed;
-
+    appState;
+    startTime = ofGetElapsedTimeMillis();
+    endTime = 10;
 }
 //--------------------------------------------------------------
 
 void ofApp::takePhoto() {
     float threshold = 90;
-    mesh.clear();
     noteBlobs.clear();
     ofPixels & pixels = vidGrabber.getPixels();
     pixels.resize(pixels.getWidth() , pixels.getHeight());
@@ -73,45 +71,17 @@ void ofApp::takePhoto() {
         }
     }
         img.setFromPixels(hiDefPixels);
-        ofxOscMessage m;
-        m.setAddress("/minmax/y");
-        m.addIntArg(noteBlobs[0].position.y);
-        m.addIntArg(noteBlobs.back().position.y);
-        oscSender.sendMessage(m, false);
-    
-    
-    
-    int highestX = noteBlobs[0].position.x;
-    int lowestX = noteBlobs[0].position.x;
-    int highestY = noteBlobs[0].position.y;
-    int lowestY = noteBlobs[0].position.y;
-
-
-    for (NoteBlob noteBlob : noteBlobs) {
-        if (noteBlob.position.x > highestX) {
-            highestX = noteBlob.position.x;
-        }
-        if (noteBlob.position.y > highestY) {
-            highestY = noteBlob.position.y;
-        }
-        if (noteBlob.position.x < lowestX) {
-             lowestX = noteBlob.position.x;
-        }
-        if (noteBlob.position.y < lowestY) {
-             lowestY = noteBlob.position.y;
-        }
-    }
+    ofxOscMessage m;
     m.setAddress("/minmax/x");
-    m.addIntArg(lowestX);
-    m.addIntArg(highestX);
+    m.addIntArg(0);
+    m.addIntArg(640);
+
     oscSender.sendMessage(m, false);
 
     ofxOscMessage m2;
     m2.setAddress("/minmax/y");
-    m2.addIntArg(lowestY);
-    m2.addIntArg(highestY);
-    ofLog() << lowestX << " || " << highestX;
-    ofLog() << lowestY << " || " << highestY;
+    m2.addIntArg(0);
+    m2.addIntArg(480);
 
     oscSender.sendMessage(m2, false);
 }
@@ -126,20 +96,46 @@ void ofApp::onBangInAnyBlob(glm::vec3 & e){
 }
 
 void ofApp::update() {
+    float timer = ofGetElapsedTimeMillis() - startTime;
+    if(timer >= endTime) {
+        if (appState.params.speed > 0) {
+            switch(appState.preset) {
+                case 1:
+                    appState.params.speed -= 0.01;
+                    break;
+                case 2:
+                    appState.params.speed -= 0.01;
+                    break;
+                case 3:
+                    appState.params.speed -= 0.01;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if(appState.params.speed < 0) {
+            appState.params.speed = 0;
+        }
+
+    
+
+    ofLog() << appState.params.speed << " speed";
+    }
+    ofLog() << timer;
+    
     vidGrabber.update();
     if (learn) {
         takePhoto();
         learn = false;
     }
     for (int i = 0; i<noteBlobs.size(); i++) {
-        noteBlobs[i].update(seed);
+        noteBlobs[i].update(appState);
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
     cam.begin();
-    
     ofSetColor(255);
     vidGrabber.draw(-ofGetWidth() / 2 , (ofGetHeight() / 2) - vidGrabber.getHeight() / 4, vidGrabber.getWidth() / 4, vidGrabber.getHeight() /4 );
     img.draw(liquidness, speedDampen);
@@ -148,23 +144,20 @@ void ofApp::draw() {
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].draw();
     }
-//    mesh.draw();
     cam.end();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    ofLog() << key;
     switch (key) {
         case ' ':
             for (int i = 0; i<noteBlobs.size(); i++) {
                 noteBlobs[i].reset();
             }
             break;
-            
         case OF_KEY_LEFT:
-          
-                liquidness -= 2;
-            
+            liquidness -= 2;
             std::cout << "Lquid: " << liquidness << std::endl;
             break;
         case OF_KEY_RIGHT:
@@ -172,19 +165,52 @@ void ofApp::keyPressed(int key){
             std::cout << "Lquid: " << liquidness << std::endl;
             break;
         case OF_KEY_DOWN:
-         
                 speedDampen -= 2;
-            
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
         case OF_KEY_UP:
             speedDampen += 2;
             std::cout << "Speed: " << speedDampen << std::endl;
             break;
-        case 49:
-            learn = true;
-            break;
             
+            
+        case 49:
+            appState.setPerlinParams(1);
+            appState.preset = 1;
+            learn = true;
+            startTime = ofGetElapsedTimeMillis();
+            endTime = 10000;
+
+            break;
+        case 50:
+            appState.setPerlinParams(2);
+            appState.preset = 2;
+            learn = true;
+            startTime = ofGetElapsedTimeMillis();
+            endTime = 10000;
+
+            break;
+        case 51:
+            appState.setPerlinParams(3);
+            appState.preset = 3;
+            learn = true;
+            startTime = ofGetElapsedTimeMillis();
+            endTime = 10000;
+
+            break;
+        case 115:
+//            "s" key
+            appState.stop();
+            ofLog() << "stop";
+            startTime = ofGetElapsedTimeMillis();
+            endTime = 0;
+
+            break;
+        case 116:
+//            "t" key
+            startTime = ofGetElapsedTimeMillis();
+            ofLog() << "timer";
+            break;
         default:
             break;
     }

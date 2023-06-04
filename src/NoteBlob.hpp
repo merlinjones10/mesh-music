@@ -1,6 +1,9 @@
 #include "ofMain.h"
 #include "Blip.hpp"
 #include "ofxOsc.h"
+#include "State.h"
+
+
 
 
 #ifndef NoteBlob_hpp
@@ -21,7 +24,7 @@ public:
     bool active; 
     bool hasBanged; 
 
-    void update(float);
+    void update(State);
     void draw();
     void reset();
     void sendMesg();

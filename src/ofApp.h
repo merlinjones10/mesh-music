@@ -3,6 +3,8 @@
 #include "ofMain.h"
 #include "NoteBlob.hpp"
 #include "ofxOsc.h"
+#include "State.h"
+
 
 class ofApp : public ofBaseApp {
     public:
@@ -21,25 +23,24 @@ class ofApp : public ofBaseApp {
         void dragEvent(ofDragInfo dragInfo);
         void gotMessage(ofMessage msg);
         void takePhoto();
-        bool learn;
+        void onBangInAnyBlob(glm::vec3 & e);
+
+    
+        State appState;
         ofEasyCam cam;
-        ofMesh mesh;
         ofImage img;
         ofVideoGrabber vidGrabber;
+        ofxOscSender oscSender;
+
+        bool learn;
         int camWidth;
         int camHeight;
-
-    
         float liquidness;
         float speedDampen;
-        float seed;
-
-    
+        float startTime; // store when we start time timer
+        float endTime; // when do want to stop the timer
         vector<NoteBlob> noteBlobs;
     
-        ofxOscSender oscSender;
-    
-    void onBangInAnyBlob(glm::vec3 & e);
 
 
 

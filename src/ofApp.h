@@ -24,7 +24,7 @@ class ofApp : public ofBaseApp {
         void gotMessage(ofMessage msg);
         void takePhoto();
         void onBangInAnyBlob(glm::vec3 & e);
-
+    void reset();
     
         State appState;
         ofEasyCam cam;

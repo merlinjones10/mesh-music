@@ -26,18 +26,20 @@ void ofApp::setup() {
     ofAddListener(NoteBlob::onBlobBangGlobal , this, &ofApp::onBangInAnyBlob);
 //    ofEnableDepthTest();
 //    ofEnableAlphaBlending();
-    liquidness = -320.0;
+    liquidness = 90;
     speedDampen = -260.0;
     ofBackground(0,0,0);
     ofxOscMessage m;
     appState;
     startTime = ofGetElapsedTimeMillis();
-    endTime = 10;
+    endTime = 10000;
 }
 //--------------------------------------------------------------
 
 void ofApp::takePhoto() {
-    float threshold = 90;
+    appState.stop();
+//    oscSender.clear();
+    float threshold = liquidness;
     noteBlobs.clear();
     ofPixels & pixels = vidGrabber.getPixels();
     pixels.resize(pixels.getWidth() , pixels.getHeight());
@@ -49,7 +51,7 @@ void ofApp::takePhoto() {
             for(int x = 0; x < pixels.getWidth(); x += skip) {
                 ofColor cur = pixels.getColor(x, y);
                 if(cur.getBrightness() < threshold) {
-                    glm::vec3 pos(x, -y, 10);
+                    glm::vec3 pos(x, -y, 9);
                     NoteBlob newNoteBlob(pos);
                     noteBlobs.push_back(newNoteBlob);
                 }
@@ -71,19 +73,12 @@ void ofApp::takePhoto() {
         }
     }
         img.setFromPixels(hiDefPixels);
-    ofxOscMessage m;
-    m.setAddress("/minmax/x");
-    m.addIntArg(0);
-    m.addIntArg(640);
+        appState.setPerlinParams(appState.preset);
+    ofxOscMessage m3;
+    m3.setAddress("/preset");
+    m3.addIntArg(appState.preset);
+    oscSender.sendMessage(m3, false);
 
-    oscSender.sendMessage(m, false);
-
-    ofxOscMessage m2;
-    m2.setAddress("/minmax/y");
-    m2.addIntArg(0);
-    m2.addIntArg(480);
-
-    oscSender.sendMessage(m2, false);
 }
 
 //--------------------------------------------------------------
@@ -92,6 +87,8 @@ void ofApp::onBangInAnyBlob(glm::vec3 & e){
         m.setAddress("/blip/position");
         m.addIntArg(e.x);
         m.addIntArg(e.y);
+        m.addIntArg(appState.preset);
+
         oscSender.sendMessage(m, false);
 }
 
@@ -101,13 +98,13 @@ void ofApp::update() {
         if (appState.params.speed > 0) {
             switch(appState.preset) {
                 case 1:
-                    appState.params.speed -= 0.01;
+                    appState.params.speed -= 0.003;
                     break;
                 case 2:
-                    appState.params.speed -= 0.01;
+                    appState.params.speed -= 0.001;
                     break;
                 case 3:
-                    appState.params.speed -= 0.01;
+                    appState.params.speed -= 0.0005;
                     break;
                 default:
                     break;
@@ -116,18 +113,20 @@ void ofApp::update() {
         if(appState.params.speed < 0) {
             appState.params.speed = 0;
         }
-
-    
-
     ofLog() << appState.params.speed << " speed";
     }
-    ofLog() << timer;
-    
+
+//    if vidGrabber.frameNew ????
     vidGrabber.update();
     if (learn) {
         takePhoto();
         learn = false;
     }
+    
+    if (ofRandom(1001) > 999.9 && appState.preset == 1 ) {
+        reset();
+    }
+    
     for (int i = 0; i<noteBlobs.size(); i++) {
         noteBlobs[i].update(appState);
     }
@@ -138,7 +137,7 @@ void ofApp::draw() {
     cam.begin();
     ofSetColor(255);
     vidGrabber.draw(-ofGetWidth() / 2 , (ofGetHeight() / 2) - vidGrabber.getHeight() / 4, vidGrabber.getWidth() / 4, vidGrabber.getHeight() /4 );
-    img.draw(liquidness, speedDampen);
+    img.draw(-320, -240);
 
     ofTranslate(-310,230, 180);
     for (int i = 0; i<noteBlobs.size(); i++) {
@@ -147,14 +146,17 @@ void ofApp::draw() {
     cam.end();
 }
 
+void ofApp::reset(){
+    for (int i = 0; i<noteBlobs.size(); i++) {
+        noteBlobs[i].reset();
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-    ofLog() << key;
     switch (key) {
         case ' ':
-            for (int i = 0; i<noteBlobs.size(); i++) {
-                noteBlobs[i].reset();
-            }
+            reset();
             break;
         case OF_KEY_LEFT:
             liquidness -= 2;
@@ -175,28 +177,31 @@ void ofApp::keyPressed(int key){
             
             
         case 49:
-            appState.setPerlinParams(1);
+            appState.stop();
+//            appState.setPerlinParams(1);
             appState.preset = 1;
             learn = true;
             startTime = ofGetElapsedTimeMillis();
-            endTime = 10000;
+            endTime = 15000;
 
             break;
         case 50:
-            appState.setPerlinParams(2);
+            appState.stop();
+
+//            appState.setPerlinParams(2);
             appState.preset = 2;
             learn = true;
             startTime = ofGetElapsedTimeMillis();
-            endTime = 10000;
-
+            endTime = 40000;
             break;
+            
         case 51:
-            appState.setPerlinParams(3);
+            appState.stop();
+
             appState.preset = 3;
             learn = true;
             startTime = ofGetElapsedTimeMillis();
-            endTime = 10000;
-
+            endTime = 1000;
             break;
         case 115:
 //            "s" key

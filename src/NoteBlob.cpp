@@ -34,11 +34,17 @@ void NoteBlob::update(State appState){
         sendMesg();
         position.z = 0;
     };
-    float amount3d = ofSignedNoise(position.x / appState.params.xParam, position.y / appState.params.yParam, ofGetElapsedTimef() + appState.params.seed / 5) * appState.params.speed;
-//    float amount2d = ofSignedNoise(position.y, ofGetElapsedTimef() + 0) * 0.1;
-//    float amount1d = (ofNoise(ofGetElapsedTimeMillis()) * 0.1) + ofRandom(0.2);
+    
+    if (ofRandom(1001) > 800 && appState.preset == 2 ) {
+        direction = glm::vec3(0, 0, 0);
+    } else {
+        float amount3d = ofSignedNoise(position.x / appState.params.xParam, position.y / appState.params.yParam, ofGetElapsedTimef() + appState.params.seed) * appState.params.speed;
+    //    float amount2d = ofSignedNoise(position.y, ofGetElapsedTimef() + 0) * 0.1;
+    //    float amount1d = (ofNoise(ofGetElapsedTimeMillis()) * 0.1) + ofRandom(0.2);
 
-    direction = glm::vec3(0, 0, amount3d);
+        direction = glm::vec3(0, 0, amount3d);
+    }
+
     position += direction;
     blip.update(position);
 }

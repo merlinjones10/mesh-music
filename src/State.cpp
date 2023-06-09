@@ -15,15 +15,15 @@ void State::setPerlinParams(int preset) {
             break;
         case 2:
             params.xParam = 100;
-            params.yParam = 150;
+            params.yParam = 150000;
             params.seed = ofRandom(10000);
-            params.speed = 10;
+            params.speed = 0.05;
             break;
         case 3:
-            params.xParam = 1;
-            params.yParam = 1;
+            params.xParam = 150;
+            params.yParam = 10;
             params.seed = ofRandom(10000);
-            params.speed = 1.1;
+            params.speed = 1.8;
             break;
         case 0:
             params.xParam = 0;
@@ -42,3 +42,6 @@ void State::stop() {
     setPerlinParams(0);
 }
 
+//void setHue() {
+//
+//}
